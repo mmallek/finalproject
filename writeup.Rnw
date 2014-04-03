@@ -1,0 +1,28 @@
+\documentclass[12pt]{article}
+\usepackage{geometry}                % See geometry.pdf to learn the layout options. There are lots.
+\geometry{letterpaper, top=1.5cm, left=2cm}                % ... or a4paper or a5paper or ... 
+\usepackage{url}
+\usepackage{amsmath}
+\usepackage{enumerate}
+\usepackage{ textcomp }
+
+\renewcommand{\familydefault}{cmss}
+
+\title{Group 2 Final Project}
+\author{PUBHLTH 690R: Statistical Modeling and Data Visualization\\
+        Members: Jon Chiang, Maritza Mallek, Sara Nu\~nez, Steele Valenzuela}
+
+\begin{document}
+\maketitle
+
+
+<<loadlibraries>>=
+require(ggplot2)
+require(GGally)
+require(RCurl)
+theme_set(theme_bw())
+@
+
+
+
+\end{document}
