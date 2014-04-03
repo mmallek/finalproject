@@ -20,12 +20,37 @@
 require(ggplot2)
 require(GGally)
 require(RCurl)
+require(knitr)
 theme_set(theme_bw())
 @
 
 <<loaddata>>=
 births = getURL("https://raw.githubusercontent.com/mmallek/finalproject/master/ncbirths.txt",ssl.verifypeer=FALSE, followlocation=1L, .opts=curlOptions(sslversion=3))
-births = read.table(text=births, sep='\t')
+births = read.table(text=births, sep='\t', header=TRUE)
 @
+
+\subsection*{Data Description}
+This dataset was acquired from OpenIntro.org's free collection. According to the metadata, `ncbirths' was released in 2004 by North Carolina. This data set has been of interest to medical researchers who are studying the relation between habits and practices of expectant mothers and the birth of their children. The data provided by OpenIntro is a random sample of 1,000 cases from this data set.
+
+\paragraph{}
+\begin{tabular}{|llll|}
+\hline
+\textbf{Variable} & \textbf{Definition} & \textbf{Format} &\textbf{ Type} \\
+\hline
+fage & Father’s age in years & integer & continuous \\
+mage & Mother’s age in years & integer & continuous\\
+weeks & Length of pregnancy in weeks & integer & discrete\\
+premie & Whether the birth was classified as premature (premie) or full-term & string & binary \\
+visits &Number of hospital visits during pregnancy & integer & discrete \\
+gained & Weight gained by mother during pregnancy in pounds & integer & continuous \\
+weight & Weight of the baby at birth in pounds & decimal & continuous \\
+lowbirthweight & Whether baby was classified as low birthweight (low) or not (not low) & string & binary\\
+gender & Gender of the baby, female or male & string & binary \\
+habit & Status of the mother as a nonsmoker or a smoker & string & binary \\
+marital & Whether mother is married or not married at birth & string & binary \\
+whitemom & Whether mom is white or not white & string & binary \\
+\hline
+\end{tabular}
+
 
 \end{document}
