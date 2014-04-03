@@ -1,0 +1,1 @@
+This repository is for "Group 2" in the Stat Methods and Data Visualizations/Methods 2 Biostats Course. All work for the final project will be kept and updated within this repo.
