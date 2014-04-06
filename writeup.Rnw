@@ -95,9 +95,13 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
 }
 @
 \newpage
-Summary plots of variables:
+Summary of variables:
 \newline
 \newline
+<<echo=FALSE>>=
+summary(births)
+@
+
 <<fig=TRUE,echo=FALSE>>=
 p1 <- qplot(mage)
 p2 <- qplot(fage)
