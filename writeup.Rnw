@@ -26,10 +26,10 @@ theme_set(theme_bw())
 @
 % Load data
 <<echo=FALSE>>=
-births = getURL("https://raw.githubusercontent.com/mmallek/finalproject
-                /master/ncbirths.txt",ssl.verifypeer=FALSE, followlocation=1L,
+births = getURL("https://raw.githubusercontent.com/mmallek/finalproject/master/ncbirths.txt",ssl.verifypeer=FALSE, followlocation=1L,
                 .opts=curlOptions(sslversion=3))
 births = read.table(text=births, sep='\t', header=TRUE)
+attach(births)
 @
 
 \subsection*{Data Description: NCbirths}
@@ -54,6 +54,74 @@ marital & Whether mother is married or not married at birth & factor  \\
 whitemom & Whether mom is white or not white & factor  \\
 \hline
 \end{tabular}
+
+% The following is a multiplot function to condense the qplots
+<<echo=FALSE>>=
+# multiplot function
+multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
+  require(grid)
+
+  # Make a list from the ... arguments and plotlist
+  plots <- c(list(...), plotlist)
+
+  numPlots = length(plots)
+
+  # If layout is NULL, then use 'cols' to determine layout
+  if (is.null(layout)) {
+    # Make the panel
+    # ncol: Number of columns of plots
+    # nrow: Number of rows needed, calculated from # of cols
+    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
+                    ncol = cols, nrow = ceiling(numPlots/cols))
+  }
+
+ if (numPlots==1) {
+    print(plots[[1]])
+
+  } else {
+    # Set up the page
+    grid.newpage()
+    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
+
+    # Make each plot, in the correct location
+    for (i in 1:numPlots) {
+      # Get the i,j matrix positions of the regions that contain this subplot
+      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
+
+      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
+                                      layout.pos.col = matchidx$col))
+    }
+  }
+}
+@
+\newpage
+Summary plots of variables:
+\newline
+\newline
+<<fig=TRUE,echo=FALSE>>=
+p1 <- qplot(mage)
+p2 <- qplot(fage)
+p3 <- qplot(weeks)
+p4 <- qplot(visits)
+p5 <- qplot(weight)
+p6 <- qplot(gained)
+p7 <- qplot(mature)
+p8 <- qplot(premie)
+p9 <- qplot(marital)
+p10 <- qplot(lowbirthweight)
+p11 <- qplot(habit)
+p12 <- qplot(whitemom)
+multiplot(p1,p2,p3,p4,cols=2)
+@
+\newline
+<<fig=TRUE,echo=FALSE>>=
+multiplot(p5,p6,p7,p8,cols=2)
+@
+\newline
+<<fig=TRUE,echo=FALSE>>=
+multiplot(p9,p10,p11,p12,cols=2)
+@
+
 
 
 \end{document}
