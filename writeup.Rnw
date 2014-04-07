@@ -115,18 +115,18 @@ summary(births)
 @
 
 <<echo=FALSE>>=
-p1 <- qplot(mage)
-p2 <- qplot(fage)
-p3 <- qplot(weeks)
-p4 <- qplot(visits)
-p5 <- qplot(weight)
-p6 <- qplot(gained)
+p1 <- qplot(mage, binwidth=1, xlab="Mother's Age in Years", main="Distribution of Mother's Age")
+p2 <- qplot(fage, binwidth=1, xlab="Father's Age in Years", main="Distribution of Father's Age")
+p3 <- qplot(weeks, binwidth=1, xlab="Length of Pregnancy in Weeks", main="Distribution of Pregnancy in Weeks")
+p4 <- qplot(visits, binwidth=1, xlab="Visits during Pregnancy", main="Distribution of Visits")
+p5 <- qplot(weight, binwidth=.5, xlab="Weight of Baby (lbs)", main="Distribution of Weight of Baby")
+p6 <- qplot(gained, binwidth=5, xlab="Weight Gained by Mother", main="Distribution of Weight Gain")
 p7 <- qplot(mature)
-p8 <- qplot(premie)
-p9 <- qplot(marital)
-p10 <- qplot(lowbirthweight)
-p11 <- qplot(habit)
-p12 <- qplot(whitemom)
+p8 <- qplot(premie, xlab="Premature or Full-term Pregnancy")
+p9 <- qplot(marital, xlab="Mother is Married or Unmarried at Birth")
+p10 <- qplot(lowbirthweight, xlab="Baby classified as Low or Normal Birthweight")
+p11 <- qplot(habit, xlab="Mother is Nonsmoker or Smoker")
+p12 <- qplot(whitemom, xlab="Ethnicity of Mother is White or Nonwhite")
 multiplot(p1,p2,p3,p4,cols=2)
 @
 
@@ -141,9 +141,9 @@ multiplot(p9,p10,p11,p12,cols=2)
 
 <<echo=FALSE>>=
 
-plot1<-ggplot(births,aes(x= weeks, y = weight))+geom_point(aes(colour=habit))
+plot1<-ggplot(births,aes(x= weeks, y = weight))+geom_point(aes(colour=habit))+ggtitle("Scatterplot of Weeks versus Weight of Baby, Factored by Mother's Smoking Habits")
 
-plot2<-ggplot(births,aes(x= weight, y = gained))+geom_point(aes(colour=lowbirthweight))
+plot2<-ggplot(births,aes(x= weight, y = gained))+geom_point(aes(colour=lowbirthweight))+ggtitle("Scatterplot of Weigth of Baby versus Weight Gained by Mother, Factored by Low or Not Low Birth Weight")
 
 plot1
 
@@ -151,15 +151,15 @@ plot1
 
 
 <<echo=FALSE>>=
-plot2<-ggplot(births,aes(x= weight, y = gained))+geom_point(aes(colour=lowbirthweight))
+plot2<-ggplot(births,aes(x= weight, y = gained))+geom_point(aes(colour=lowbirthweight))+ggtitle("Scatterplot of Weigth of Baby versus Weight Gained by Mother, Factored by Low or Not Low Birth Weight")
 plot2
 @
 
 <<echo=FALSE>>=
-box1<-qplot(factor(gender), weight, data = births, geom = "boxplot") 
-box2<-qplot(factor(whitemom), weight, data = births, geom = "boxplot")
-box3<-qplot(factor(premie), weight, data = births, geom = "boxplot") 
-box4<-qplot(factor(mature), weight, data = births, geom = "boxplot") 
+box1<-qplot(factor(gender), weight, data = births, geom = "boxplot", xlab="Gender", ylab="Weight of Baby") 
+box2<-qplot(factor(whitemom), weight, data = births, geom = "boxplot", xlab="Ethnicity of Mother", ylab="Weight of Baby")
+box3<-qplot(factor(premie), weight, data = births, geom = "boxplot", xlab="Term of Pregnancy", ylab="Weight of Baby") 
+box4<-qplot(factor(mature), weight, data = births, geom = "boxplot", ylab="Weight of Baby") 
 
 
 @
