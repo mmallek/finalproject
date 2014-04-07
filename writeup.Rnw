@@ -13,7 +13,7 @@
         Members: Jon Chiang, Maritza Mallek, Sara Nu\~nez, Steele Valenzuela}
 
 \begin{document}
-\SweaveOpts{concordance=TRUE}
+%\SweaveOpts{concordance=TRUE}
 \maketitle
 
 % Load libraries
@@ -26,8 +26,7 @@ theme_set(theme_bw())
 @
 % Load data
 <<echo=FALSE>>=
-births = getURL("https://raw.githubusercontent.com/mmallek/finalproject/master/ncbirths.txt",ssl.verifypeer=FALSE, followlocation=1L,
-                .opts=curlOptions(sslversion=3))
+births = getURL("https://raw.githubusercontent.com/mmallek/finalproject/master/ncbirths.txt",ssl.verifypeer=FALSE, followlocation=1L, .opts=curlOptions(sslversion=3))
 births = read.table(text=births, sep='\t', header=TRUE)
 attach(births)
 @
@@ -102,7 +101,7 @@ Summary of variables:
 summary(births)
 @
 
-<<fig=TRUE,echo=FALSE>>=
+<<echo=FALSE>>=
 p1 <- qplot(mage)
 p2 <- qplot(fage)
 p3 <- qplot(weeks)
@@ -117,18 +116,18 @@ p11 <- qplot(habit)
 p12 <- qplot(whitemom)
 multiplot(p1,p2,p3,p4,cols=2)
 @
-\newline
-<<fig=TRUE,echo=FALSE>>=
+
+<<cho=FALSE>>=
 multiplot(p5,p6,p7,p8,cols=2)
 @
-\newline
-<<fig=TRUE,echo=FALSE>>=
+
+<<echo=FALSE>>=
 multiplot(p9,p10,p11,p12,cols=2)
 @
 
 
 
-<<fig=TRUE,echo=FALSE>>=
+<<echo=FALSE>>=
 
 
 
@@ -144,9 +143,9 @@ plot3
 @
 
 
-<<fig=TRUE,echo=FALSE>>=
+<<echo=FALSE>>=
 
-
+@
 
 
 
