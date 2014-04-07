@@ -128,4 +128,18 @@ multiplot(p9,p10,p11,p12,cols=2)
 
 
 
+<<fig=TRUE,echo=FALSE>>=
+multiplot(plot1,plot2,plot3,catols=3)
+
+
+plot1<-ggplot(births,aes(x= weeks, y = weight))+geom_point(aes(colour=habit))
+
+plot2<-ggplot(births,aes(x= weight, y = gained))+geom_point(aes(colour=lowbirthweight))
+
+plot3<-ggplot(births,aes(x= weight, y = gained))+geom_point(aes(colour=lowbirthweight))
+@
+
+
+
+
 \end{document}
