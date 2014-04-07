@@ -31,32 +31,6 @@ births = read.table(text=births, sep='\t', header=TRUE)
 attach(births)
 @
 
-\section*{Data Description: NCbirths}
-This dataset was acquired from OpenIntro.org's free collection. According to the metadata, `ncbirths' was released in 2004 by North Carolina. This data set has been of interest to medical researchers who are studying the relation between habits and practices of expectant mothers and the birth of their children. The data provided by OpenIntro is a random sample of 1,000 cases from this data set.
-
-\paragraph{}
-\
-\begin{tabular}{|lp{8cm}ll|}
-\hline
-\textbf{Variable} & \textbf{Definition} & \textbf{Format} & \textbf{Type}\\
-\hline
-
-fage & Father’s age in years & integer & continuous \\
-mage & Mother’s age in years & integer & continuous\\
-weeks & Length of pregnancy in weeks & integer & discrete\\
-premie & Whether the birth was classified as premature (premie) or full-term & string & binary \\
-visits &Number of hospital visits during pregnancy & integer & discrete \\
-gained & Weight gained by mother during pregnancy in pounds & integer & continuous \\
-weight & Weight of the baby at birth in pounds & decimal & continuous \\
-lowbirthweight & Whether baby was classified as low birthweight (low) or not (not low) & string & binary\\
-gender & Gender of the baby, female or male & string & binary \\
-habit & Status of the mother as a nonsmoker or a smoker & string & binary \\
-marital & Whether mother is married or not married at birth & string & binary \\
-whitemom & Whether mom is white or not white & string & binary \\
-\hline
-\end{tabular}
-
-\paragraph{} Of the variables presented in the dataset, there are several options for thinking about predictors vs. response variables. Some of these are clearly predictors: fage, mage, marital, habit, gender, whitemom. Others could be considered either predictors or responses: weeks, premie, visits, gained, weight (or lowbirthweight). Based on the dataset description, which states that the research was exploring "habits and practices of expectant mothers." Our inference is that habits and practices refer to weight gained by the mother and the smoking status of the mother. The most likely responses are hospital visits, premature birth, and weight. Remaining variables probably have an indirect influence, are interacting variables, or are variables that would be confounding if omitted from the analysis.
 
 % The following is a multiplot function to condense the qplots
 <<echo=FALSE>>=
@@ -97,6 +71,42 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
   }
 }
 @
+
+\section*{Data Description: NCbirths}
+This dataset was acquired from OpenIntro.org's free collection. According to the metadata, `ncbirths' was released in 2004 by North Carolina. This data set has been of interest to medical researchers who are studying the relation between habits and practices of expectant mothers and the birth of their children. The data provided by OpenIntro is a random sample of 1,000 cases from this data set.
+
+\paragraph{}
+\
+\begin{tabular}{|lp{8cm}ll|}
+\hline
+\textbf{Variable} & \textbf{Definition} & \textbf{R Format} & \textbf{Type}\\
+\hline
+
+fage & Father’s age in years & numeric & continuous \\
+mage & Mother’s age in years & numeric & continuous\\
+weeks & Length of pregnancy in weeks & numeric & discrete\\
+premie & Whether the birth was classified as premature (premie) or full-term & factor & binary \\
+visits &Number of hospital visits during pregnancy & numeric & discrete \\
+gained & Weight gained by mother during pregnancy in pounds & numeric & continuous \\
+weight & Weight of the baby at birth in pounds & numeric & continuous \\
+lowbirthweight & Whether baby was classified as low birthweight (low) or not (not low) & factor & binary\\
+gender & Gender of the baby, female or male & factor & binary \\
+habit & Status of the mother as a nonsmoker or a smoker & factor & binary \\
+marital & Whether mother is married or not married at birth & factor & binary \\
+whitemom & Whether mom is white or not white & factor & binary \\
+\hline
+\end{tabular}
+
+\paragraph{} Of the variables presented in the dataset, there are several options for thinking about predictors vs. response variables. Some of these are clearly predictors: fage, mage, marital, habit, gender, whitemom. Others could be considered either predictors or responses: weeks, premie, visits, gained, weight (or lowbirthweight). Based on the dataset description, which states that the research was exploring "habits and practices of expectant mothers." Our inference is that habits and practices refer to weight gained by the mother and the smoking status of the mother. The most likely responses are hospital visits, weeks (related to premie), and weight (related to lowbirthweight). Remaining variables probably have an indirect influence, are interacting variables, or are variables that would be confounding if omitted from the analysis.
+
+\paragraph{} It's not stated explicitly in the metadata, but it appears that premie is a binary variable generated by weeks $<$ 37 = premie and weeks $\geq$ 37 = full term. Similarly, lowbirthweight is classified as low when weight $\leq 5.50$ and as not low when weight $>$ 5.50 (See Figure \ref{fig:binplot}).
+
+<<binplot, echo=FALSE, fig.height=3, fig.width=6, warning=FALSE, fig.cap='Plots of continuous variable vs. binary variable; generated to determine rules for creating binary variables since this information was omitted from the metadata.', message=FALSE>>=
+p1=qplot(weeks, premie)
+p2=qplot(weight, lowbirthweight) + geom_vline(x=5.51)
+multiplot(p1,p2,cols=2)
+@
+
 \newpage
 \subsection*{Summary of variables}
 
@@ -159,12 +169,16 @@ box4<-qplot(factor(mature), weight, data = births, geom = "boxplot")
 <<,echo=FALSE>>=
 multiplot(box1,box2,box3,box4,cols=2)
 @
-
+\newpage
 \subsection*{Exploring predictors and responses with scatterplots}
-<<echo=FALSE, fig.height=3, fig.width=3>>=
-qplot(habit, premie)
-
+<<echo=FALSE>>=
+p1=qplot(gained, weeks)
+p2=qplot(gained, visits)
+p3=qplot(gained, weight)
+p4=qplot(habit, weeks, geom="boxplot")
+p5=qplot(habit, visits, geom="boxplot")
+p6=qplot(habit, weight, geom="boxplot")
+multiplot(p1,p2,p3,p4,p5,p6, cols=2)
 @
-
 
 \end{document}
