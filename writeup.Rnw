@@ -13,6 +13,7 @@
         Members: Jon Chiang, Maritza Mallek, Sara Nu\~nez, Steele Valenzuela}
 
 \begin{document}
+\SweaveOpts{concordance=TRUE}
 %\SweaveOpts{concordance=TRUE}
 \maketitle
 
@@ -139,7 +140,7 @@ multiplot(p9,p10,p11,p12,cols=2)
 @
 
 
-<<,echo=FALSE>>=
+<<echo=FALSE>>=
 
 plot1<-ggplot(births,aes(x= weeks, y = weight))+geom_point(aes(colour=habit))
 
@@ -150,7 +151,7 @@ plot1
 @
 
 
-<<,echo=FALSE>>=
+<<echo=FALSE>>=
 plot2<-ggplot(births,aes(x= weight, y = gained))+geom_point(aes(colour=lowbirthweight))
 plot2
 @
@@ -166,7 +167,7 @@ box4<-qplot(factor(mature), weight, data = births, geom = "boxplot")
 \newpage
 \subsection*{Boxplot Figures}
 
-<<,echo=FALSE>>=
+<<echo=FALSE>>=
 multiplot(box1,box2,box3,box4,cols=2)
 @
 \newpage
