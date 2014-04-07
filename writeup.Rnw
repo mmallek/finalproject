@@ -17,7 +17,7 @@
 \maketitle
 
 % Load libraries
-<<echo=FALSE>>=
+<<echo=FALSE, message=FALSE>>=
 require(ggplot2)
 require(GGally)
 require(RCurl)
@@ -31,28 +31,32 @@ births = read.table(text=births, sep='\t', header=TRUE)
 attach(births)
 @
 
-\subsection*{Data Description: NCbirths}
+\section*{Data Description: NCbirths}
 This dataset was acquired from OpenIntro.org's free collection. According to the metadata, `ncbirths' was released in 2004 by North Carolina. This data set has been of interest to medical researchers who are studying the relation between habits and practices of expectant mothers and the birth of their children. The data provided by OpenIntro is a random sample of 1,000 cases from this data set.
 
 \paragraph{}
-\begin{tabular}{|lll|}
+\
+\begin{tabular}{|lp{8cm}ll|}
 \hline
-\textbf{Variable} & \textbf{Definition} & \textbf{Format} \\
+\textbf{Variable} & \textbf{Definition} & \textbf{Format} & \textbf{Type}\\
 \hline
-fage & Father age in years & integer \\
-mage & Mother age in years & integer \\
-weeks & Length of pregnancy in weeks & integer \\
-premie & Whether the birth was classified as premature or full-term & factor  \\
-visits & Number of hospital visits during pregnancy & integer \\
-gained & Weight gained by mother during pregnancy in pounds & integer  \\
-weight & Weight of the baby at birth in pounds & number  \\
-lowbirthweight & Whether baby was classified as low birthweight or not & factor \\
-gender & Gender of the baby, female or male & factor  \\
-habit & Status of the mother as a nonsmoker or a smoker & factor  \\
-marital & Whether mother is married or not married at birth & factor  \\
-whitemom & Whether mom is white or not white & factor  \\
+
+fage & Father’s age in years & integer & continuous \\
+mage & Mother’s age in years & integer & continuous\\
+weeks & Length of pregnancy in weeks & integer & discrete\\
+premie & Whether the birth was classified as premature (premie) or full-term & string & binary \\
+visits &Number of hospital visits during pregnancy & integer & discrete \\
+gained & Weight gained by mother during pregnancy in pounds & integer & continuous \\
+weight & Weight of the baby at birth in pounds & decimal & continuous \\
+lowbirthweight & Whether baby was classified as low birthweight (low) or not (not low) & string & binary\\
+gender & Gender of the baby, female or male & string & binary \\
+habit & Status of the mother as a nonsmoker or a smoker & string & binary \\
+marital & Whether mother is married or not married at birth & string & binary \\
+whitemom & Whether mom is white or not white & string & binary \\
 \hline
 \end{tabular}
+
+\paragraph{} Of the variables presented in the dataset, there are several options for thinking about predictors vs. response variables. Some of these are clearly predictors: fage, mage, marital, habit, gender, whitemom. Others could be considered either predictors or responses: weeks, premie, visits, gained, weight (or lowbirthweight). Based on the dataset description, which states that the research was exploring "habits and practices of expectant mothers." Our inference is that habits and practices refer to weight gained by the mother and the smoking status of the mother. The most likely responses are hospital visits, premature birth, and weight. Remaining variables probably have an indirect influence, are interacting variables, or are variables that would be confounding if omitted from the analysis.
 
 % The following is a multiplot function to condense the qplots
 <<echo=FALSE>>=
@@ -94,9 +98,8 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
 }
 @
 \newpage
-Summary of variables:
-\newline
-\newline
+\subsection*{Summary of variables}
+
 <<echo=FALSE>>=
 summary(births)
 @
@@ -126,7 +129,7 @@ multiplot(p9,p10,p11,p12,cols=2)
 @
 
 
-<<fig=TRUE,echo=FALSE>>=
+<<,echo=FALSE>>=
 
 plot1<-ggplot(births,aes(x= weeks, y = weight))+geom_point(aes(colour=habit))
 
@@ -137,7 +140,7 @@ plot1
 @
 
 
-<<fig=TRUE,echo=FALSE>>=
+<<,echo=FALSE>>=
 plot2<-ggplot(births,aes(x= weight, y = gained))+geom_point(aes(colour=lowbirthweight))
 plot2
 @
@@ -151,13 +154,17 @@ box4<-qplot(factor(mature), weight, data = births, geom = "boxplot")
 
 @
 \newpage
-Boxplot Figures
-\newline
-<<fig=TRUE,echo=FALSE>>=
+\subsection*{Boxplot Figures}
+
+<<,echo=FALSE>>=
 multiplot(box1,box2,box3,box4,cols=2)
 @
 
+\subsection*{Exploring predictors and responses with scatterplots}
+<<echo=FALSE, fig.height=3, fig.width=3>>=
+qplot(habit, premie)
 
+@
 
 
 \end{document}
