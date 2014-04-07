@@ -13,7 +13,6 @@
         Members: Jon Chiang, Maritza Mallek, Sara Nu\~nez, Steele Valenzuela}
 
 \begin{document}
-\SweaveOpts{concordance=TRUE}
 %\SweaveOpts{concordance=TRUE}
 \maketitle
 
@@ -172,7 +171,7 @@ multiplot(box1,box2,box3,box4,cols=2)
 @
 \newpage
 \subsection*{Exploring predictors and responses with scatterplots}
-<<echo=FALSE>>=
+<<echo=FALSE, fig.cap="Preliminary data exploration of 2 predictor variables (mother's weight gain and smoking habit) against 3 response variables (pregnancy duration in weeks, hospital visits, baby weight).">>=
 p1=qplot(gained, weeks)
 p2=qplot(gained, visits)
 p3=qplot(gained, weight)
