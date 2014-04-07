@@ -126,26 +126,37 @@ multiplot(p9,p10,p11,p12,cols=2)
 @
 
 
-
-<<echo=FALSE>>=
-
-
+<<fig=TRUE,echo=FALSE>>=
 
 plot1<-ggplot(births,aes(x= weeks, y = weight))+geom_point(aes(colour=habit))
 
 plot2<-ggplot(births,aes(x= weight, y = gained))+geom_point(aes(colour=lowbirthweight))
 
-plot3<-ggplot(births,aes(x= weight, y = gained))+geom_point(aes(colour=lowbirthweight))
-
 plot1
-plot2
-plot3
+
 @
 
+
+<<fig=TRUE,echo=FALSE>>=
+plot2<-ggplot(births,aes(x= weight, y = gained))+geom_point(aes(colour=lowbirthweight))
+plot2
+@
 
 <<echo=FALSE>>=
+box1<-qplot(factor(gender), weight, data = births, geom = "boxplot") 
+box2<-qplot(factor(whitemom), weight, data = births, geom = "boxplot")
+box3<-qplot(factor(premie), weight, data = births, geom = "boxplot") 
+box4<-qplot(factor(mature), weight, data = births, geom = "boxplot") 
+
 
 @
+\newpage
+Boxplot Figures
+\newline
+<<fig=TRUE,echo=FALSE>>=
+multiplot(box1,box2,box3,box4,cols=2)
+@
+
 
 
 
