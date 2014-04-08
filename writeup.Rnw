@@ -13,7 +13,6 @@
         Members: Jon Chiang, Maritza Mallek, Sara Nu\~nez, Steele Valenzuela}
 
 \begin{document}
-%\SweaveOpts{concordance=TRUE}
 \maketitle
 
 % Load libraries
