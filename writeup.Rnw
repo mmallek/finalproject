@@ -183,4 +183,84 @@ p6=qplot(habit, weight, geom="boxplot")
 multiplot(p1,p2,p3,p4,p5,p6, cols=2)
 @
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Summary stats needed for table of variables %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Use for number of missing values in each distribution
+<<echo=FALSE>>=
+summary(births)
+@
+
+% FATHERS AGE CONFIDENCE INTERVALS:
+<<echo=FALSE>>=
+
+# Mean and variance
+mean(fage,na.rm=TRUE)
+var(fage,na.rm=TRUE)
+
+# calculation of n = (number of values in fage) - (number NAs)
+1000-171
+
+
+# 95 percent CI for mean
+# lower bound, upper bound
+mean(fage,na.rm=TRUE) - qnorm(.975)*(sd(fage,na.rm=TRUE)/sqrt(829))
+mean(fage,na.rm=TRUE) + qnorm(.975)*(sd(fage,na.rm=TRUE)/sqrt(829))
+
+# 95 percent CI for variance
+# lower bound, upper bound
+((829-1)*var(fage,na.rm=TRUE))/qchisq(0.975,df=(829-1))
+((829-1)*var(fage,na.rm=TRUE))/qchisq(0.025,df=(829-1))
+
+@
+
+
+% MOTHERS AGE CONFIDENCE INTERVALS:
+<<echo=FALSE>>=
+
+# Mean and variance
+mean(mage,na.rm=TRUE)
+var(mage,na.rm=TRUE)
+
+# No missing values in mage -> n=1000
+
+# 95 percent CI for mean
+# lower bound, upper bound
+mean(mage,na.rm=TRUE) - qnorm(.975)*(sd(mage,na.rm=TRUE)/sqrt(1000))
+mean(mage,na.rm=TRUE) + qnorm(.975)*(sd(mage,na.rm=TRUE)/sqrt(1000))
+
+# 95 percent CI for variance
+# lower bound, upper bound
+((1000-1)*var(mage,na.rm=TRUE))/qchisq(0.975,df=(1000-1))
+((1000-1)*var(mage,na.rm=TRUE))/qchisq(0.025,df=(1000-1))
+
+@
+
+
+% WEEKS CONFIDENCE INTERVALS:
+<<echo=FALSE>>=
+
+# Mean and variance
+mean(weeks,na.rm=TRUE)
+var(weeks,na.rm=TRUE)
+
+# calculation of n = (number of values in fage) - (number NAs)
+1000-2
+
+
+# 95 percent CI for mean
+# lower bound, upper bound
+mean(weeks,na.rm=TRUE) - qnorm(.975)*(sd(weeks,na.rm=TRUE)/sqrt(988))
+mean(weeks,na.rm=TRUE) + qnorm(.975)*(sd(weeks,na.rm=TRUE)/sqrt(988))
+
+# 95 percent CI for variance
+# lower bound, upper bound
+((998-1)*var(weeks,na.rm=TRUE))/qchisq(0.975,df=(998-1))
+((998-1)*var(weeks,na.rm=TRUE))/qchisq(0.025,df=(998-1))
+
+@
+
+
 \end{document}
