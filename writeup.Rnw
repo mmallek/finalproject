@@ -106,18 +106,18 @@ weight & lowbirthweight & low $<= 5.5 \text{ pounds}<$ not low
 \centering
 \begin{tabular}{ccccccccc}
 \hline
-Variable & \multirow{2}{*}{\parbox{2cm}{Variable Definitions}}  & Min & Median & Mean & Max & \multirow{2}{*}{\parbox{2cm}{Missing Values}} & 95\% CI for Mean & 95\% CI for Median\\
+Variable & \multirow{2}{*}{\parbox{2cm}{Variable Definitions}}  & Min & Median & Mean & Max & \multirow{2}{*}{\parbox{2cm}{Missing Values}} & 95\% CI for Mean & 95\% CI for Variance\\
  & & & & & & & & \\
 \hline
 fage & father's age & 14 & 30 & 30.26 & 55 & 171 & (29.7953, 30.71616) & (41.6428, 50.49614)\\
 mage & mother's age & 13 & 27 & 27 & 50 & 0 & (26.61489, 27.38511) & (35.4345, 42.23142) \\
-weeks & gestational age & 20 & 39 & 38.33 & 45 & 2 & (38.15187, 38.51747) & (7.886806,9.40128) \\
-visits & hospital visits & 0 & 12.0 & 12.1 & 30 & 9 \\
+weeks & gestational age & 20 & 39 & 38.33 & 45 & 2 & (38.15279, 38.51655) & (7.886806,9.40128) \\
+visits & hospital visits & 0 & 12.0 & 12.1 & 30 & 9 & (11.85871,12.35118) & (14.35011,17.11633)\\
 %gained & \multirow{2}{*}{weight gained} & 0 & 30 & 30.33 & 85 & 27 \\
 %&  by mother & & & & & \\
-gained & \multirow{2}{*}{\parbox{3cm}{weight gained by mother}} & 0 & 30 & 30.33 & 85 & 27 \\
+gained & \multirow{2}{*}{\parbox{3cm}{weight gained by mother}} & 0 & 30 & 30.33 & 85 & 27 & (29.43097,31.22063) & (185.9254,222.1265) \\
  & & & & & & & & \\
-weight & birth weight of baby & 1 & 7.31 & 7.101 & 11.750 & 0 \\
+weight & birth weight of baby & 1 & 7.31 & 7.101 & 11.750 & 0 & (7.007482,7.194518) & (2.08949,2.490288)\\
 \end{tabular}
 % This caption is dumb but I am not sure what to put here.
 \caption{Master table for summarizing data}
@@ -259,12 +259,12 @@ multiplot(p1,p2,p3,p4,p5,p6, cols=2)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Use for number of missing values in each distribution
-<<echo=FALSE>>=
+<<echo=FALSE,eval=FALSE>>=
 summary(births)
 @
 
 % FATHERS AGE CONFIDENCE INTERVALS:
-<<echo=FALSE>>=
+<<echo=FALSE,eval=FALSE>>=
 
 # Mean and variance
 mean(fage,na.rm=TRUE)
@@ -288,7 +288,7 @@ mean(fage,na.rm=TRUE) + qnorm(.975)*(sd(fage,na.rm=TRUE)/sqrt(829))
 
 
 % MOTHERS AGE CONFIDENCE INTERVALS:
-<<echo=FALSE>>=
+<<echo=FALSE,eval=FALSE>>=
 
 # Mean and variance
 mean(mage,na.rm=TRUE)
@@ -310,7 +310,7 @@ mean(mage,na.rm=TRUE) + qnorm(.975)*(sd(mage,na.rm=TRUE)/sqrt(1000))
 
 
 % WEEKS CONFIDENCE INTERVALS:
-<<echo=FALSE>>=
+<<echo=FALSE,eval=FALSE>>=
 
 # Mean and variance
 mean(weeks,na.rm=TRUE)
@@ -322,13 +322,82 @@ var(weeks,na.rm=TRUE)
 
 # 95 percent CI for mean
 # lower bound, upper bound
-mean(weeks,na.rm=TRUE) - qnorm(.975)*(sd(weeks,na.rm=TRUE)/sqrt(988))
-mean(weeks,na.rm=TRUE) + qnorm(.975)*(sd(weeks,na.rm=TRUE)/sqrt(988))
+mean(weeks,na.rm=TRUE) - qnorm(.975)*(sd(weeks,na.rm=TRUE)/sqrt(998))
+mean(weeks,na.rm=TRUE) + qnorm(.975)*(sd(weeks,na.rm=TRUE)/sqrt(998))
 
 # 95 percent CI for variance
 # lower bound, upper bound
 ((998-1)*var(weeks,na.rm=TRUE))/qchisq(0.975,df=(998-1))
 ((998-1)*var(weeks,na.rm=TRUE))/qchisq(0.025,df=(998-1))
+
+@
+
+% VISITS CONFIDENCE INTERVALS:
+<<echo=FALSE,eval=FALSE>>=
+
+# Mean and variance
+mean(visits,na.rm=TRUE)
+var(visits,na.rm=TRUE)
+
+# calculation of n = (number of values in fage) - (number NAs)
+1000-9
+
+
+# 95 percent CI for mean
+# lower bound, upper bound
+mean(visits,na.rm=TRUE) - qnorm(.975)*(sd(visits,na.rm=TRUE)/sqrt(991))
+mean(visits,na.rm=TRUE) + qnorm(.975)*(sd(visits,na.rm=TRUE)/sqrt(991))
+
+# 95 percent CI for variance
+# lower bound, upper bound
+((991-1)*var(visits,na.rm=TRUE))/qchisq(0.975,df=(991-1))
+((991-1)*var(visits,na.rm=TRUE))/qchisq(0.025,df=(991-1))
+
+@
+
+% GAINED CONFIDENCE INTERVALS:
+<<echo=FALSE,eval=FALSE>>=
+
+# Mean and variance
+mean(gained,na.rm=TRUE)
+var(gained,na.rm=TRUE)
+
+# calculation of n = (number of values in fage) - (number NAs)
+1000-27
+
+
+# 95 percent CI for mean
+# lower bound, upper bound
+mean(gained,na.rm=TRUE) - qnorm(.975)*(sd(gained,na.rm=TRUE)/sqrt(973))
+mean(gained,na.rm=TRUE) + qnorm(.975)*(sd(gained,na.rm=TRUE)/sqrt(973))
+
+# 95 percent CI for variance
+# lower bound, upper bound
+((973-1)*var(gained,na.rm=TRUE))/qchisq(0.975,df=(973-1))
+((973-1)*var(gained,na.rm=TRUE))/qchisq(0.025,df=(973-1))
+
+@
+
+% WEIGHT CONFIDENCE INTERVALS:
+<<echo=FALSE,eval=FALSE>>=
+
+# Mean and variance
+mean(weight,na.rm=TRUE)
+var(weight,na.rm=TRUE)
+
+# calculation of n = (number of values in fage) - (number NAs)
+1000-0
+
+
+# 95 percent CI for mean
+# lower bound, upper bound
+mean(weight,na.rm=TRUE) - qnorm(.975)*(sd(weight,na.rm=TRUE)/sqrt(1000))
+mean(weight,na.rm=TRUE) + qnorm(.975)*(sd(weight,na.rm=TRUE)/sqrt(1000))
+
+# 95 percent CI for variance
+# lower bound, upper bound
+((1000-1)*var(weight,na.rm=TRUE))/qchisq(0.975,df=(1000-1))
+((1000-1)*var(weight,na.rm=TRUE))/qchisq(0.025,df=(1000-1))
 
 @
 
