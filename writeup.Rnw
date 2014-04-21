@@ -163,12 +163,7 @@ Variable & Factor & Counts \\
 \section*{Original Plots from Rough Draft}
 Keeping these in the doc for now in case we want to use any of them in the final.
 
-<<binplot, echo=FALSE, fig.height=3, fig.width=6, warning=FALSE, fig.cap='Plots of continuous variable vs. binary variable; generated to determine rules for creating binary variables since this information was omitted from the metadata.', message=FALSE>>=
-p1=qplot(mage, mature, xlab="Maturity of mother by age (years)", ylab=NULL)
-p2=qplot(weeks, premie, xlab="Gestation period (weeks)???", ylab=NULL)
-p3=qplot(weight, lowbirthweight, xlab="Weight of baby (lbs)", ylab=NULL) + geom_vline(x=5.51)
-multiplot(p1,p2,p3,cols=2)
-@
+
 
 %Steele, I appreciate how much work you did to put together this summary. Since most of this is going into our big table, I'm not sure we'll keep much. However, I didn't want to delete it until we're ready since we may still decide to pull from some of the original analyses.
 \newpage
