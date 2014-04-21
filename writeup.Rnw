@@ -19,6 +19,7 @@
 \maketitle
 
 \tableofcontents
+
 \newpage
 % Load libraries
 <<echo=FALSE, message=FALSE>>=
@@ -167,22 +168,6 @@ Variable & Factor & Counts \\
 Keeping these in the doc for now in case we want to use any of them in the final.
 
 
-
-%Steele, I appreciate how much work you did to put together this summary. Since most of this is going into our big table, I'm not sure we'll keep much. However, I didn't want to delete it until we're ready since we may still decide to pull from some of the original analyses.
-\newpage
-\subsection*{Summary of variables} 
-\paragraph{} As we explore the basic summary and descriptitve statistics of the dataset 'ncbirths', we find a few interestings tidbits that may give us invaluable insight into ?.  For the first variable, 'fage', father's age, we see that the mean 30.3 years of age and the range is from 14 years to 55 years of age. Additionally, the median father's age is 30.0.  Clearly, we see that the age distribution of fatherhood takes on a wide set of values. It should also be noted that out of the 1,000 samples collected from this variable, 171 (17.1\%) are missing.  Reasons may include single motherhood, father's refusal to let his age be known, same-sex couples where a male figure may not have been traditionally involved, but maybe only...(help!?).
-\paragraph{} The next variable, 'weeks', is the measure of the length of pregnancy in weeks. The mean and median was 38.3 and 39 weeks, respectively. The length of pregnancy ranged from 20 to 45 weeks.  Also, there were 2 missing variables. In relation to the variable 'weeks', 'premie' is a binary variable that factors the length of pregnancy as a premature ('premie') if it is less than 37 weeks and full term if the length of pregnancy is 37 weeks or more. Therefore, 846 of the pregnancies (84.8\%) were listed as a 'full term' pregnancy and 152 pregnancies (15.2\%) were listed as a 'premie' or premature pregnancy. 
-\paragraph{} The number of hospital visits during a pregnancy is denoted by the variable 'visits'.  The mean number of hospital visits is 12.1 and the median number of hospital visits is 12.0. The range of hospital visits varied from 0 to 30 visits while there were 9 missing variables. [Can we confirm normal distribution for this variable? b/c if it rightly or leftly skewed, I imagine we have some problems with the state of North Carolina? Note to myself but if someone else wants to help, please feel free to do so.]
-\paragraph{} Marital status is denoted by the variable 'marital'. We see that the number of mother's that were married at the time birth was 386 (38.7\%) compared with 613 (61.4\%) mother's that were not married. There was one variable that did not report marital status. I would like to note that this one missing variable could be due to a complicated relationship status as a variable like this does not cover the entire spectrum, but rather a black and white marriage slip.  Otherwise, one may jump to the simple conclusion that the one missing variable was due to an error or a lack of reporting.
-\paragraph{} Weight gained by the mother during pregnancy is denoted by the variable 'gained'. The mean and median are 30.3 and 30.0 pounds, respectively. The range in weight gained by the mother during pregnancy is from 0 to 85 pounds. These extremes are very concerning, but nonetheless, the interquartile range is from 20 to 38 pounds. Lastly, there were 27 missing variables. 
-\paragraph{} Weight of the baby, at birth, in pounds, is denoted by the variable 'weight' (not to be confused by the previous variable 'gained'). The mean and median of the weight of the baby, at birth, in pounds, is 7.10 and 7.31, respectively. The range is from 1 pound to 11.75 pounds.  Obviously, the extremes signify a very small baby and a garganteous baby. In relation to the variable 'weight', 'lowbirthweight' is a binary variable that if 'weight' is less than or equal to 5.50 pounds, then the baby is classified as having a 'low' birthweight and 'now low' if the weight of a baby is greater than 5.50 pounds. Of the 1,000 samples chosen, 111 babies (11.1\%) were classified as having low birth weight while 889 babies (88.9\%) were classified as not having low birth weight. Also, it should be noted that there were no missing variables for 'weight' or 'lowbirthweight'. 
-\paragraph{} The sex of a baby is is denoted by the binary variable 'gender'. We see that there are 503 female babies (50.3\%) and 497 male babies (49.7\%).  One should note that there were no babies classified as having both gender traits, or a hermaphrodite, which would complicate the nature of the traditional binary variable 'gender'. 
-\paragraph{} The status of the mother as a smoker or nonsmoker is denoted by the binary variable 'habit'. We see that the majority of mother's were listed as nonsmokers (873 or 87.4\%) as opposed to smokers (126 or 12.6\%). There was one missing variable.  It would be interesting to note if the mothers were in a smoking environment, as in their spouse, family members, or whoever they were surrounded by on a daily basis, smoked by them.  I am sure this could be hypothesizedin relation to low birth weight. Obviously, we are not epidemiologists and there would be many more factors that account for low birth weight. 
-\paragraph{} Lastly, the variable 'whitemom' accounts for the ethnicity of a mother being white or not white. We see that there are 284 (28.5\%) mothers that were not white and 714 mothers that were white while there were 2 missing variables. This may bring in (71.5\%) to question why these two variables are not accounted for. Was it not self-report? Did the mother skip the question? Was it reported by a third-party? We may never know. 
-<<echo=FALSE>>=
-summary(births)
-@
 
 <<echo=FALSE>>=
 p1 <- qplot(mage, binwidth=1, xlab="Mother's Age in Years", main="Distribution of Mother's Age")
