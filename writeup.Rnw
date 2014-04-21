@@ -14,9 +14,12 @@
 \author{PUBHLTH 690R: Statistical Modeling and Data Visualization\\
         Members: Jon Chiang, Maritza Mallek, Sara Nu\~nez, Steele Valenzuela}
 
+
 \begin{document}
 \maketitle
 
+\tableofcontents
+\newpage
 % Load libraries
 <<echo=FALSE, message=FALSE>>=
 require(ggplot2)
