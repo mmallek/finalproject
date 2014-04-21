@@ -1,0 +1,87 @@
+\documentclass[11pt]{article}
+\usepackage{graphicx, verbatim}
+\usepackage{url}
+\usepackage{microtype}
+\usepackage{amsmath}
+\usepackage{enumerate}
+\usepackage{textcomp}
+\usepackage{lscape}
+\usepackage{multirow}
+\setlength{\textwidth}{6.5in} 
+\setlength{\textheight}{9in}
+\setlength{\oddsidemargin}{0in} 
+\setlength{\evensidemargin}{0in}
+\setlength{\topmargin}{-1.5cm}
+
+
+\begin{document}
+
+\begin{center}
+{\bf \Large Variable Selection and Model Diagnostics for Regression} \newline
+
+{\bf Jonathan Chiang} \\
+ \end{center}
+ 
+
+
+% Load libraries
+<<echo=FALSE, message=FALSE>>=
+require(ggplot2)
+require(GGally)
+require(RCurl)
+require(knitr)
+require(leaps)
+theme_set(theme_bw())
+@
+
+\subsection*{Part One: Variable Selection}
+ 
+  When conducting a multiple linear regression, we must first consider the definition of regression. A regression is a functional relationship between a covariate (predictor) of interest and an outcome of interest. This means that one variable can help us \textbf{predict} the value of another variable.
+
+If we have a multiple linear regression, we will have multiple or many predictor variables to help us predict the most accurate expected value of a response variable. It is very important to select the best predictor variables for the regression analysis. Variable selection has two approaches: all possible regressions and automatic methods.
+
+The all possible regressions approach actually looks at all possible combinations or subsets of each and all predictor variables and can fit the data according to a pre-selected criteria. Such criteria, proposed earlier, AIC and BIC each have a subsequent score, which allows us to rank our models accordingly. 
+
+
+ \subsection*{Part Two: Using R for Variable Selection}
+ 
+ 
+
+<<echo=FALSE, message=FALSE,fig=TRUE>>=
+
+births = getURL("https://raw.githubusercontent.com/mmallek/finalproject/master/ncbirths.txt",ssl.verifypeer=FALSE, followlocation=1L, .opts=curlOptions(sslversion=3))
+births = read.table(text=births, sep='\t', header=TRUE)
+births$lowbirthweight<-NULL
+births$premie<-NULL
+Selection<-regsubsets(weight~fage+mage+weeks+gender+habit+whitemom, data=births,nbest=4)
+plot(Selection,scale="adjr2")  
+@
+
+<<echo=FALSE, message=FALSE,fig=TRUE>>=
+plot(Selection,scale="bic")     
+@
+
+\subsubsection*{Automatic Methods}
+<<echo=FALSE, message=FALSE>>=
+births<-na.omit(births)
+null<-lm(weight~1,data=births)
+full<- lm(weight~.,data=births)
+@
+
+\subsubsection*{STEPWISE FUNCTION}
+
+\subsubsection*{Forward Direction}
+<<echo=FALSE, message=FALSE>>=
+step(null, scope=list(lower=null, upper=full), direction="forward")
+@
+\subsubsection*{Backwards Direction}
+<<echo=FALSE, message=FALSE>>=
+step(full, data=births, direction="backward")
+@
+\subsection*{Model Diagnostics and Cooke's Distance}
+<<echo=FALSE, message=FALSE,fig=TRUE>>=
+pairs(~weeks + marital + gained + gender + habit +
+whitemom, data=births)
+@
+\subsubsection*{Residuals and Leverage}
+\end{document}
