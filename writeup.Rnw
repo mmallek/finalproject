@@ -14,10 +14,11 @@
 \author{PUBHLTH 690R: Statistical Modeling and Data Visualization\\
         Members: Jon Chiang, Maritza Mallek, Sara Nu\~nez, Steele Valenzuela}
 
+
 \begin{document}
 \maketitle
 
-% need table of contents
+\tableofcontents
 
 \newpage
 % Load libraries
