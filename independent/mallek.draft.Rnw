@@ -35,46 +35,39 @@ births = read.table(text=births, sep='\t', header=TRUE)
 attach(births)
 @
 
-Regression trees are a tool that I have seen in popular science but not in many of the ecology articles I read for my own research. After looking into the topic I realized it is actually called Classification and Regression Tree analysis. Classification trees are used when the dependent variable is categorical, whereas a regression tree is used when the dependent variable is continuous.
+Classification and Regression Trees (CART) are a nonparametric approach used to generate prediction models. Through binary recursive partitioning, this process works by testing each potential independent variable used to build the model and finding the value at which the most meaningful (binary) split between two branches can be created. The recursive aspect occurs as this process is repeated for each branch of the tree until some predefined set of constraints are met, whcih stops the mode.
 
-Split always go to the left when the result of any logical equation is TRUE. This is called binary partitioning. To create the tree, we employ binary recursive partitioning, splitting each branch into further branches to achieve the highest accuracy.
+These trees are popular because they are fairly intuitive to interpret, especially for non-statisticians, including in public health settings. At each node an equality is shown; for a given observation, if the inequality resolves as TRUE, the reader follows the left branch. The alternative to CARTs are typically some form of regression, such as GLM. For a doctor in a hospital, consulting a regression tree is much simpler than generating and interpreting a regression model. Because CARTs are nonparametric, we cannot use the results to explain why certain variable values result in the observed response, but in situations where we are interested in the likelihood and not necessarily interested in how to change an outcome, CARTs are reasonable enough.
 
-CARTs do not guarantee perfect classification. But they get as close as a logistic regression model with less time and effort expended.
+Analysts running CART analysis in R typically use either the tree or the rpart package. The tree package uses residuals, similarly to GLMs, while rpart grows the tree using the Gini coefficient of the data. For this analysis, we used the tree package. 
 
-They are popular as decision support tools because they are easy to understand and the binary nature of the result is familar to most people. 
+We are interested in weight at birth. For a classification tree, this means the "lowbirthweight" field; for a regression tree, this means the "weight" field. Here we accept the biological significance of a 5.5 lb cutoff for low birth rate, and therefore use the factored and binary variable lowbirthweight. If we look at the full dataset, we can see how many observations of low birth weight there are.
 
-So, how to put it into practice? There are two packages for R that will do the hard work for you, `rpart` and `tree`. 
 
-First, let's review the data and variables:
-<<>>=
-head(births)
-@
-Wwe are interested in weight at birth. For a classification tree, this means the "lowbirthweight" field; for a regression tree, this means the "weight" field. Here we accept the biological significance of a 5.5 lb cutoff for low birth rate, and therefore use the factored and binary variable lowbirthweight. If we look at the full dataset, we can see how many observations of low birth weight there are.
-
-<<>>=
-xtabs( ~ lowbirthweight, data=births)
-@
-
-First, we use all the available variables to try and fit the data. Here we use the tree package.
-<<>>=
+First, we used all the available variables (the full model) to try and fit the data.
+<<fullmodel, fig.height=6, fig.width=6, echo=FALSE, eval=FALSE>>=
 form1 = lowbirthweight ~ fage + mage + mature + weeks + visits + marital + gained + gender + habit + whitemom
 bt1 = tree(form1, data = births)
 summary(bt1)
 plot(bt1)
 text(bt1, cex=0.7)
+# Residual mean deviance:  0.3 = 237 / 790
 @
 
-These results show that the predictor `weeks` is by far the most important predictor. However, it is disingenous to use the `weeks` variable to predict low birth weight because if we know the birth weight, we by definition know the duration of pregnancy. In fact, these preliminary results suggest that one may be a proxy for the other, and we note that premature birth is biologically considered birth at 36 weeks or less gestation. Since the start data of pregnancy can have an error of $\pm 2$ weeks, these two variables seem very strongly correlated. We can verify this with a quick plot:
-<<>>=
-qplot(weeks, weight, data=births)
-ml1 = lm(weight ~ weeks, data=births)
-summary(ml1)
+The results showed that the predictor `weeks` is by far the most important predictor. However, it is disingenous to use the `weeks` variable to predict low birth weight because if we know the birth weight, we by definition know the duration of pregnancy. 
+
+Given this reasoning, we proceed with the analysis, omitting weeks as a predictor variable. We specify the model as:
+
+<<model2, results='hide'>>=
+lowbirthweight ~ fage + mage + mature + visits + marital + gained + gender + habit + whitemom
 @
 
-Given this reasoning, we proceed with the analysis, omitting weeks as a predictor variable:
-<<>>=
+<<echo=FALSE, include=FALSE>>=
 form2 = lowbirthweight ~ fage + mage + mature + visits + marital + gained + gender + habit + whitemom
 bt2 = tree(form2, data=births)
+@
+
+<<>>=
 summary(bt2)
 plot(bt2)
 text(bt2, cex=0.7)
@@ -87,232 +80,55 @@ bt3 = tree(form2, data=births, control=tree.control(nobs=1000, minsize=2, mindev
 summary(bt3)
 plot(bt3)
 text(bt3, cex=0.7)
+# Residual mean deviance:  0 = 0 / 697
 @
 
 Having "grown the tree," the next step is to prune the tree. Cross-validation is the process of using some reserved part of the data to test the quality of the model fit on the main part of the data. The default method of cross-validation in the tree package is 10-fold, in which 10\% of the data is left out of the initial fitting process.
 
 <<>>=
-
-
-prunept1 = cv.tree(bt2)
+prune1 = cv.tree(bt2)
+plot(prune1)
 plot(prune.tree(bt2))
 
 # the lowest deviation is found at a tree size of?
-(best = which(prunept1$dev==min(prunept1$dev)))
+(best = which(prune1$dev==min(prune1$dev)))
 
 # next we run another fit
-bt2.p = prune.tree(bt2, best = mean(best), method="misclass")
-summary(bt2.p)
-plot(bt2.p)
-text(bt2.p, cex=0.8)
+bt2.pm = prune.tree(bt2, best = mean(best), method="misclass")
+bt2.pd = prune.tree(bt2, best = mean(best), method="deviance")
 
-######################################
-bests = numeric(1000)
-for(i in 1:1000){
-    temp = cv.tree(bt3)
-    bests[i] = which(temp$dev==min(temp$dev))
-}
-mean(bests)
-plot(cv.tree(bt3))
-temp = cv.tree(bt3)
-which(temp$dev==min(temp$dev))
-# do the steps for a our maximum model
-prunept2 = cv.tree(bt3)
-plot(prune.tree(bt3))
+summary(bt2.pm)
+# Residual mean deviance:  0.525 = 418 / 796
+plot(bt2.pm)
+text(bt2.pm, cex=0.8)
 
-# the lowest deviation is found at a tree size of?
-(best = which(prunept2$dev==min(prunept2$dev)))
-
-# next we run another fit
-bt3.p = prune.tree(bt3, best = mean(best), method="misclass")
-summary(bt3.p)
-plot(bt3.p)
-text(bt3.p, cex=0.8)
-
-# reprune 1
-prunept3 = cv.tree(bt3.p)
-plot(prune.tree(bt3.p))
-
-(best = which(prunept3$dev==min(prunept3$dev)))
-
-bt3.p2 = prune.tree(bt3.p, best = mean(best), method="misclass")
-summary(bt3.p2)
-plot(bt3.p2)
-text(bt3.p2, cex=0.8)
-
-# reprune 2
-prunept4 = cv.tree(bt3.p2)
-plot(prune.tree(bt3.p2))
-
-(best = which(prunept4$dev==min(prunept4$dev)))
-
-bt3.p3 = prune.tree(bt3.p2, best = mean(best), method="misclass")
-summary(bt3.p3)
-plot(bt3.p3)
-text(bt3.p3, cex=0.8)
-
-# reprune 3
-prunept5 = cv.tree(bt3.p3)
-plot(prune.tree(bt3.p3))
-
-(best = which(prunept5$dev==min(prunept5$dev)))
-
-bt3.p4 = prune.tree(bt3.p3, best = mean(best), method="misclass")
-summary(bt3.p4)
-plot(bt3.p4)
-text(bt3.p4, cex=0.8)
-
-# reprune 4
-prunept5 = cv.tree(bt3.p3)
-plot(prune.tree(bt3.p3))
-
-(best = which(prunept5$dev==min(prunept5$dev)))
-
-bt3.p5 = prune.tree(bt3.p4, best = mean(best), method="misclass")
-summary(bt3.p5)
-plot(bt3.p5)
-text(bt3.p5, cex=0.8)
-
-# reprune 5
-prunept6 = cv.tree(bt3.p5)
-plot(prune.tree(bt3.p5))
-
-(best = which(prunept6$dev==min(prunept6$dev)))
-
-bt3.p6 = prune.tree(bt3.p5, best = mean(best), method="misclass")
-summary(bt3.p5)
-plot(bt3.p5)
-text(bt3.p5, cex=0.8)
-
-# reprune 6
-prunept7 = cv.tree(bt3.p6)
-plot(prune.tree(bt3.p6))
-
-(best = which(prunept7$dev==min(prunept7$dev)))
-
-bt3.p7 = prune.tree(bt3.p6, best = mean(best), method="misclass")
-summary(bt3.p7)
-plot(bt3.p7)
-text(bt3.p7, cex=0.8)
-
-# reprune 7
-prunept8 = cv.tree(bt3.p7)
-plot(prune.tree(bt3.p7))
-
-(best = which(prunept8$dev==min(prunept8$dev)))
-
-bt3.p8 = prune.tree(bt3.p7, best = mean(best), method="misclass")
-summary(bt3.p8)
-plot(bt3.p8)
-text(bt3.p8, cex=0.8)
+summary(bt2.pd)
+# Residual mean deviance:  0.531 = 423 / 797
+plot(bt2.pd)
+text(bt2.pd, cex=0.8)
 @
 
-`Rpart` is the second commonly used packages for CART analysis.
-
-<<growtree.lowbirthweight>>=
-bt1 = rpart(form2, data=births, method="class")
-bt2 = rpart(form2, data=births, method="class", control=rpart.control(cp=0.001))
-
-printcp(bt1)
-plotcp(bt1)
-print(bt1)
-summary(bt1)
-plot(bt1, uniform=TRUE, main="Regression Tree for Low Birth Weight")
-text(bt1, use.n=TRUE, all=TRUE, cex=0.8)
-
-cparam = bt1$cptable[which.min(bt1$cptable[,"xerror"]),"CP"]
-pbt1 = prune(bt1, cp=cparam)
-plot(pbt1, uniform=TRUE, main="Pruned Regression Tree for Low Birth Weight")
-text(pbt1, use.n=TRUE, all=TRUE, cex=.8)
-
-printcp(bt2)
-plotcp(bt2)
-print(bt2)
-summary(bt2)
-plot(bt2, uniform=TRUE, main="Regression Tree for Low Birth Weight")
-text(bt2, use.n=TRUE, all=TRUE, cex=0.8)
-
-cparam = bt2$cptable[which.min(bt2$cptable[,"xerror"]),"CP"]
-pbt2 = prune(bt2, cp=cparam)
-plot(bt2, uniform=TRUE, main="Pruned Regression Tree for Low Birth Weight")
-text(bt2, use.n=TRUE, all=TRUE, cex=.8)
-
-expec = predict(bt1,type="class")
-obs=births$lowbirthweight
-sum(as.numeric(expec!=obs))
-
-expec = predict(bt2,type="class")
-obs=births$lowbirthweight
-sum(as.numeric(expec!=obs))
-
-bt1.pruned = prune(bt1, cp=0.05)
-printcp(bt1)
-expec = predict(bt1.pruned,type="class")
-obs=births$lowbirthweight
-sum(as.numeric(expec!=obs))
-plot(bt1.pruned, uniform=T, main="Classification Tree")
-text(bt1.pruned, use.n=TRUE, all=TRUE, cex=0.5)
-
-bt2.pruned = prune(bt2, cp=0.05)
-printcp(bt2)
-expec = predict(bt2.pruned,type="class")
-obs=births$lowbirthweight
-sum(as.numeric(expec!=obs))
-plot(bt2.pruned, uniform=T, main="Classification Tree")
-text(bt2.pruned, use.n=TRUE, all=TRUE, cex=0.5)
-
-@
-
-There are some more advanced classification and regression tree packages available.
-<<>>=
-# party
-require(party)
-btparty1 = ctree(form2, data=births)
-
-plot(btparty1 , main="conditional Inference Tree")
-
-# table of prediction errors
-table(predict(btparty1), births$weeks)
-
-#estimated class probabilities
-tr.pred = predict(btparty1, newdata=births, type="prob")
-
-@
-
-
-<<>>=
-# maptree
-require(maptree)
-require(cluster)
-draw.tree(clip.rpart(rpart(births), best=4), nodeinfo=TRUE, cases="births", cex=0.7)
-a = agnes(births[-10], method="ward")
-names(a)
-a$diss
-@
+How to interpret output tree
+Numbers in parentheses are always p(low) p(not low) and value in tree is the best guess for that branch.
 
 <<>>=
 # compare tree to second-order GLM
-glm1 = glm(form, data=births, family=binomial)
+glm1 = glm(form2, data=births, family=binomial)
 summary(glm1)
-# Residual deviance: 263.51 on 789 df --> 0.3339797
-@
-
-<<>>=
-glm2 = glm(form2, data=births, family=binomial)
-summary(glm2)
-#Residual deviance: 457.24  on 791  degrees of freedom
-glm3 = glm(form3, data=births, family=binomial)
-summary(glm3)
-#Residual deviance: 512.21  on 819  degrees of freedom
-@
-
-<<randomforest>>=
-require(randomForest)
-bt1 <- randomForest(form2, data=births)
-print(bt1)
-importance(bt1) 
+# Residual deviance: 457.24  on 791  degrees of freedom
+457.24/791
 
 @
+
+\begin{tabular}{lll}
+Residual Mean Deviance & Equation & Output \\
+Full Model & 237 / 790 & 0.3 
+\end{tabular}
+
+\begin{tabular}{lll}
+Misclassification Rate & Equation & Output \\
+Full Model & 8 / 800 & 0.0475
+\end{tabular}
 
 \subsubsection{References}
 http://www.researchmethods.org/CARTIntroTutorial.pdf
