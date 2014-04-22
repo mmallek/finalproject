@@ -83,6 +83,14 @@ Of the 13 variables presented in the dataset, there are several options for thin
 
 One of the main challenges from this dataset is that we do not have data synced to a gestational age other than at term. The values for visits, weeks, weight, and gained are all collected at birth. While it makes sense to include all variables in any exploratory analysis of relationships among these variables, the value of any of these as prediction terms is problematic because they are collected at the end of the pregancy.
 
+We are most interested in the baby's weight at birth, which we will examine in both its continuous and factored format. This is our initial, full model:
+<<eval=FALSE>>=
+lm(weight ~ mage + fage + weeks + visits + gained + habit + whitemom + marital + gender)
+glm(lowbirthweight ~ mage + fage + weeks + visits + gained + habit + whitemom + marital + gender, family=binomial)
+@
+
+
+
 \begin{landscape}
 
 \begin{table}
@@ -130,7 +138,7 @@ weight & birth weight of baby & 1 & 7.31 & 7.101 & 11.750 & 0 & (7.007482,7.1945
 \end{landscape}
 
 
-
+\begin{table}
 \begin{centering}
 \begin{tabular}{lll}
 \hline
@@ -161,7 +169,10 @@ Variable & Factor & Counts \\
 \multirow{2}{*}{lowbirthweight} & low & 111 \\
   & not low & 889
 \end{tabular}
+\caption{Additional table for summarizing data}
+\label{table:binaries}
 \end{centering}
+\end{table}
 
 \section*{Original Plots from Rough Draft}
 Keeping these in the doc for now in case we want to use any of them in the final.
@@ -175,22 +186,9 @@ p3 <- qplot(weeks, binwidth=1, xlab="Length of Pregnancy in Weeks", main="Distri
 p4 <- qplot(visits, binwidth=1, xlab="Visits during Pregnancy", main="Distribution of Visits")
 p5 <- qplot(weight, binwidth=.5, xlab="Weight of Baby (lbs)", main="Distribution of Weight of Baby")
 p6 <- qplot(gained, binwidth=5, xlab="Weight Gained by Mother", main="Distribution of Weight Gain")
-p7 <- qplot(mature)
-p8 <- qplot(premie, xlab="Premature or Full-term Pregnancy")
-p9 <- qplot(marital, xlab="Mother is Married or Unmarried at Birth")
-p10 <- qplot(lowbirthweight, xlab="Baby classified as Low or Normal Birthweight")
-p11 <- qplot(habit, xlab="Mother is Nonsmoker or Smoker")
-p12 <- qplot(whitemom, xlab="Ethnicity of Mother is White or Nonwhite")
-multiplot(p1,p2,p3,p4,cols=2)
+multiplot(p1,p2,p3,p4,p5,p6,cols=2)
 @
 
-<<cho=FALSE>>=
-multiplot(p5,p6,p7,p8,cols=2)
-@
-
-<<echo=FALSE>>=
-multiplot(p9,p10,p11,p12,cols=2)
-@
 
 
 <<echo=FALSE>>=
@@ -222,17 +220,6 @@ box4<-qplot(factor(mature), weight, data = births, geom = "boxplot", ylab="Weigh
 
 <<echo=FALSE>>=
 multiplot(box1,box2,box3,box4,cols=2)
-@
-\newpage
-\subsection*{Exploring predictors and responses with scatterplots}
-<<echo=FALSE, fig.cap="Preliminary data exploration of 2 predictor variables (mother's weight gain and smoking habit) against 3 response variables (pregnancy duration in weeks, hospital visits, baby weight).">>=
-p1=qplot(gained, weeks)
-p2=qplot(gained, visits)
-p3=qplot(gained, weight)
-p4=qplot(habit, weeks, geom="boxplot")
-p5=qplot(habit, visits, geom="boxplot")
-p6=qplot(habit, weight, geom="boxplot")
-multiplot(p1,p2,p3,p4,p5,p6, cols=2)
 @
 
 \subsection*{Summary stats for megatable}
