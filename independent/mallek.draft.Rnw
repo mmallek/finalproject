@@ -1,0 +1,273 @@
+\documentclass[12pt]{article}
+\usepackage{geometry}                
+\geometry{letterpaper, top=1.5cm, left=2cm}     
+\usepackage{url}
+\usepackage{amsmath}
+\usepackage{enumerate}
+\usepackage{ textcomp }
+
+\renewcommand{\familydefault}{cmss}
+
+\title{Group 2 Final Project}
+\author{PUBHLTH 690R: Statistical Modeling and Data Visualization\\
+       Individual Project: Maritza Mallek, Regression Trees}
+
+\begin{document}
+\maketitle
+
+% Load libraries
+<<echo=FALSE, message=FALSE>>=
+require(ggplot2)
+require(GGally)
+require(RCurl)
+require(knitr)
+theme_set(theme_bw())
+@
+% New libraries for indpendent project
+<<echo=FALSE, message=FALSE>>=
+require(rpart)
+require(tree)
+@
+% Load data
+<<echo=FALSE>>=
+births = getURL("https://raw.githubusercontent.com/mmallek/finalproject/master/ncbirths.txt",ssl.verifypeer=FALSE, followlocation=1L, .opts=curlOptions(sslversion=3))
+births = read.table(text=births, sep='\t', header=TRUE)
+attach(births)
+@
+
+\section{Regression Trees using the rpart package}
+<<growtree.lowbirthweight>>=
+form1 = lowbirthweight ~ fage + mage + mature + weeks + visits + marital + gained + gender + habit + whitemom
+bt1 = rpart(form1, data=births, method="class", control=rpart.control(cp=0.001))
+
+printcp(bt1)
+plotcp(bt1)
+print(bt1)
+summary(bt1)
+plot(bt1, uniform=TRUE, main="Regression Tree for Low Birth Weight")
+text(bt1, use.n=TRUE, all=TRUE, cex=0.8)
+#post(fit, file="/Users/mmallek/Documents/Academics/UMass/2014-spring/StatMethodsDataVis/finalproject/independent/tree.ps", title = "Regression Tree for Pregnancy Duration")
+
+cparam = bt1$cptable[which.min(bt1$cptable[,"xerror"]),"CP"]
+pbt1 = prune(bt1, cp=cparam)
+plot(pbt1, uniform=TRUE, main="Pruned Regression Tree for Low Birth Weight")
+text(pbt1, use.n=TRUE, all=TRUE, cex=.8)
+#post(pfit, file = "/Users/mmallek/Documents/Academics/UMass/2014-spring/StatMethodsDataVis/finalproject/independent/ptree.ps", title = "Pruned Classification Tree for Pregnancy Duration")
+@
+
+<<>>=
+# use the default controls
+bt2 = rpart(lowbirthweight ~ fage + mage + mature + weeks + visits + marital + gained + gender + habit + whitemom, method="class", data = births)
+
+print(bt2)
+printcp(bt2)
+plotcp(bt2)
+summary(bt2)
+
+plot(bt2, uniform=T, main="Classification Tree")
+text(bt2, use.n=TRUE, all=TRUE, cex=0.5)
+
+# make a big tree and work backwards
+
+bt3 = rpart(form, data=births, method="class", control=rpart.control(cp=0.005))
+print(bt3)
+printcp(bt3)
+plotcp(bt3)
+summary(bt3)
+
+plot(bt3, uniform=T, main="Classification Tree")
+text(bt3, use.n=TRUE, all=TRUE, cex=0.5)
+
+expec = predict(bt3,type="class")
+obs=births$lowbirthweight
+sum(as.numeric(expec!=obs))
+
+bt3.pruned = prune(bt3, cp=0.05)
+printcp(bt3)
+expec = predict(bt3.pruned,type="class")
+obs=births$lowbirthweight
+sum(as.numeric(expec!=obs))
+plot(bt3.pruned, uniform=T, main="Classification Tree")
+text(bt3.pruned, use.n=TRUE, all=TRUE, cex=0.5)
+# misclassified values = 66
+# worse
+
+require(rattle)
+require(rpart.plot)
+form = as.formula(lowbirthweight ~ fage + mage + mature + weeks + visits + marital + gained + gender + habit + whitemom)
+births.2tree = rpart(form, data=births)
+summary(births.2tree)
+prp(births.2tree)
+new.tree.1 = prp(births.2tree, snip=TRUE)$obj
+prp(new.tree.1)
+fancyRpartPlot(births.2tree)
+@
+
+\subsection{Regression Trees using the tree package}
+<<growtree.weight>>=
+fit = tree(weight ~ visits + gained + gender + habit + marital + whitemom, data=births, method="anova")
+
+plot(fit, type="uniform", main="Regression Tree for Birth Weight")
+text(fit, splits=TRUE, label="yval")
+
+printcp(fit)
+plotcp(fit)
+#rsq.rpart(fit)
+#print(fit)
+summary(fit)
+plot(fit, uniform=TRUE, main="Regression Tree for Birth Weight")
+text(fit, use.n=TRUE, all=TRUE, cex=0.8)
+#post(fit, file="/Users/mmallek/Documents/Academics/UMass/2014-spring/StatMethodsDataVis/finalproject/independent/tree.ps", title = "Regression Tree for Pregnancy Duration")
+
+cparam = fit$cptable[which.min(fit$cptable[,"xerror"]),"CP"]
+pfit = prune(fit, cp=cparam)
+plot(pfit, uniform=TRUE, main="Pruned Regression Tree for Birth Weight")
+text(pfit, use.n=TRUE, all=TRUE, cex=.8)
+#post(pfit, file = "/Users/mmallek/Documents/Academics/UMass/2014-spring/StatMethodsDataVis/finalproject/independent/ptree.ps", title = "Pruned Classification Tree for Pregnancy Duration")
+@
+
+\subsection{Regular Multiple Linear Regression}
+<<>>=
+mlr = lm(weeks ~ fage + mage + visits + gained + gender + habit + marital + whitemom, data=births)
+summary(mlr)
+mlr = lm(weight ~ fage + mage + visits + gained + gender + habit + marital + whitemom, data=births)
+summary(mlr)
+
+qplot(weight, weeks, data=births) + geom_vline(x=5.50) + geom_hline(y=36.5)
+
+@
+
+\subsection{Other}
+<<>>=
+m2 <- lm(weight~gained+weeks,data=births)
+qqnorm(m2$residuals)
+qqline(m2$residuals)
+@
+
+Regression trees are a tool that I have seen in popular science but not in many of the ecology articles I read for my own research. After looking into the topic I realized it is actually called Classification and Regression Tree analysis. Classification trees are used when the dependent variable is categorical, whereas a regression tree is used when the dependent variable is continuous.
+
+Split always go to the left when the result of any logical equation is TRUE. This is called binary partitioning. To create the tree, we employ binary recursive partitioning, splitting each branch into further branches to achieve the highest accuracy.
+
+CARTs do not guarantee perfect classification. But they get as close as a logistic regression model with less time and effort expended.
+
+They are popular as decision support tools because they are easy to understand and the binary nature of the result is familar to most people. 
+
+So, how to put it into practice? There are two packages for R that will do the hard work for you, `rpart` and `tree`. 
+
+<<>>=
+# review the data
+head(births)
+
+
+# we are interested in weight at birth. For a classification tree, this means the "lowbirthweight" field; for a regression tree, this means the "weight" field.
+
+# if we look at the full dataset, how many observations of low birth weight to we have?
+xtabs( ~ lowbirthweight, data=births)
+
+# first, we use all the available variables to try and fit the data
+births.tree1 = tree(lowbirthweight ~ fage + mage + mature + weeks + visits + marital + gained + gender + habit + whitemom, data = births)
+summary(births.tree1)
+
+births.tree2 = tree(lowbirthweight ~ weeks + visits + marital + gained, data = births, control=tree.control(1039,mindev=0.003))
+summary(births.tree2)
+
+# Residual mean deviance = 0.262 = 242.1 / 924
+# Misclassification error rate: 0.0475 = 38 / 800 
+
+# let's look at the first tree
+# plot() draws the diagram
+plot(births.tree1)
+# text() fills in the labels
+text(births.tree1, cex=0.8)
+# to prune the tree we use cross-validation to identify the point to prune
+# default is 10-fold cross-validation (leave out 10% of data)
+(prunept1 = cv.tree(births.tree1))
+(prunept2 = cv.tree(births.tree2))
+plot(prune.tree(births.tree2))
+
+# the lowest deviation is found at a tree size of?
+(best = which(prunept$dev==min(prunept$dev)))
+
+# next we run another fit
+births.tree2 = prune.tree(births.tree1, best = 8, method="misclass")
+summary(births.tree2)
+# unfortunately, this doesn't fix it.
+plot(births.tree2)
+text(births.tree2, cex=0.8)
+@
+
+
+
+
+<<>>=
+# let's try the same thing with party
+require(party)
+births.party.tree1 = ctree(lowbirthweight ~ fage + mage + mature + weeks + visits + marital + gained + gender + habit + whitemom, data=births)
+
+plot(births.party.tree1 , main="conditional Inference Tree")
+
+# table of prediction errors
+table(predict(births.party.tree1), births$weeks)
+
+#estimated class probabilities
+tr.pred = predict(births.party.tree1, newdata=births, type="prob")
+
+@
+
+
+<<>>=
+# maptree
+require(maptree)
+require(cluster)
+draw.tree(clip.rpart(rpart(births), best=8), nodeinfo=TRUE, cases="births", cex=0.7)
+a = agnes(births[-10], method="ward")
+names(a)
+a$diss
+@
+
+<<>>=
+# compare tree to second-order GLM
+glm1 = glm(form, data=births, family=binomial)
+summary(glm1)
+# Residual deviance: 263.51 on 789 df --> 0.3339797
+@
+
+But what if we are truly predicting? As in, let's only put the information in our predictive model that we would have prior to labor and delivery. This definitely excludes weeks, and could exclude gained and visits.
+<<>>=
+qplot(gained, data=births)
+qplot(visits, data=births)
+
+form2 = as.formula(lowbirthweight ~ fage + mage + mature  + visits + marital + gained + gender + habit + whitemom)
+form3 = as.formula(lowbirthweight ~ fage + mage + mature  + marital + gender + habit + whitemom)
+
+bt2 = tree(form2, data = births)
+summary(bt1)
+#Residual mean deviance:  0.4669 = 369.3 / 791 
+#Misclassification error rate: 0.07491 = 60 / 801 
+plot(bt2)
+text(bt2, cex=0.8)
+
+bt3 = tree(form3, data = births)
+summary(bt3)
+#Residual mean deviance:  0.4669 = 369.3 / 791 
+#Misclassification error rate: 0.07491 = 60 / 801 
+plot(bt3)
+text(bt3, cex=0.8)
+
+glm2 = glm(form2, data=births, family=binomial)
+summary(glm2)
+#Residual deviance: 457.24  on 791  degrees of freedom
+glm3 = glm(form3, data=births, family=binomial)
+summary(glm3)
+#Residual deviance: 512.21  on 819  degrees of freedom
+@
+
+
+\subsubsection{References}
+http://www.researchmethods.org/CARTIntroTutorial.pdf
+
+
+
+
+
+\end{document}
