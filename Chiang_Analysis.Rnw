@@ -84,4 +84,33 @@ pairs(~weeks + marital + gained + gender + habit +
 whitemom, data=births)
 @
 \subsubsection*{Residuals and Leverage}
+
+Model Diagnostics. After fitting regession models we need to determine whether our model assumptions can be used before actually making an inference. We should look for violations and look for the consequential inferential procedures that would be void for these incorrect conclusions.
+
+Model Diagnostics combines both graphical and statistical methods. 
+
+Using our formal model
+<<>>=
+results<-(lm(weight ~ weeks+gender,births))
+pairs(~weeks+weight,data=births)
+ggplot(births,aes(x=weeks,y=weight))+geom_point(shape=1,position=position_jitter(width=1,height=0.5))+geom_smooth(method=lm)
+@
+
+Leverage = ability to move a regressoin model by itself by moving in the y diretion.  shifted in teh y direction. leaverage is always between one and zero 
+zero = no effect on regression model 
+
+leverage = to 1 means the lines follws the point perfectly. 
+
+<<>>=
+lev<-hat(model.matrix(results))
+plot(lev,col="blue")
+births[lev>0.05,]
+plot(births$weight,births$weeks)
+points(births[969,]$weight,births[969,]$weeks,col='red')
+@
+
+
+<<>>=
+results.residuals<-resid(results)
+@
 \end{document}
