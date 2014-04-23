@@ -161,12 +161,11 @@ Adjusted R squared \\
 
 \end{frame}
 
-\begin{frame}{Sara: Variable Selection and Model Diagnostics}
-
+\begin{frame}[fragile, allowframebreaks]{Sara: Variable Selection and Model Diagnostics}
 \textbf{The algorithm} \\
 There were 10 possible predictor variables considered in analysis of \emph{NCbirths}. To make it simpler, 4 variables are considered here.\\
 \medskip
-1. Creates a matrix where each $row_i$ corresponds to one possible combination of predictor variables \\
+Creates a matrix where each $row_i$ corresponds to one possible combination of predictor variables \\
 % Having trouble displaying output
 <<echo=FALSE>>=
 
@@ -185,32 +184,64 @@ threes <- cbind(t(three),0)
 fours <- t(four)
 
 combos <- rbind(ones,twos,threes,fours)
-# threes
+threes
 @
 
 \end{frame}
 
-\begin{frame}{Sara: Variable Selection and Model Diagnostics}
 
-2. Iterate through the rows of the matrix and fit a linear model, with $weight$ as the response variable \\
+\begin{frame}[fragile, allowframebreaks]{Sara: Variable Selection and Model Diagnostics}
+
+Iterate through the rows of the matrix and fit a linear model, with $weight$ as the response variable \\
 <<echo=FALSE>>=
 mat <- matrix(NA, nrow=15, ncol=3)
 colnames(mat) <- c("AIC", "BIC","Adj R^2")
 out <- list()
 @
+\small
+<<>>=
+for (i in 1:15){
+  rowi0 <- combos[i,]
+  rowi <- rowi0[rowi0 != 0]
+  datai <- as.data.frame(cbind(births[,rowi],births[,"weight"]))
+  names(datai) <- c(rowi,"weight")
+  mi <- lm(datai$weight~.,data=datai)
+  mat[i,] <- c(AIC(mi),BIC(mi),summary(mi)$adj.r.squared)
+  out[[i]] <- summary(mi)$coef
+  }
+@
 
-% Having trouble displaying code
-% insert 'for loop' here
 
 \end{frame}
 
-\begin{frame}{Sara: Variable Selection and Model Diagnostics}
+\begin{frame}[fragile,allowframebreaks]{Sara: Variable Selection and Model Diagnostics}
 
-3. Find the models with smallest AIC and BIC values, and largest adjusted R squared value\\
+<<>>=
+# order of linear models based on AIC 
+order(mat[,1])
+# order of linear models based on BIC 
+order(mat[,2])
+# order of linear models based on adjusted R^2 
+order(mat[,3])
+@
 
-% display orders here
-% display one out[[]] just to show it
 
+\end{frame}
+
+\begin{frame}[fragile,allowframebreaks]{Sara: Variable Selection and Model Diagnostics}
+Best model according to AIC and BIC
+<<>>=
+out[[15]]
+@
+\end{frame}
+
+\begin{frame}[fragile,allowframebreaks]{Sara: Variable Selection and Model Diagnostics}
+Best model according to adjusted $R^2$
+<<>>=
+out[[14]]
+@
+
+Note: Lab exercises explore what to do next...
 \end{frame}
 
 \begin{frame}{Sara: Variable Selection and Model Diagnostics}
@@ -221,6 +252,8 @@ out <- list()
 This method does not consider transformations of variables or interactions \\
 \item
 Model selection is subjective - which criterion is best? - how would you select a model? \\
+\item
+Differences between possible models are subtle \\
 \item
 In the actual analysis, wanted to be able to interpret betas, but models were stronger with transformations and interactions - difficult interpretation \\
 \end{itemize}
