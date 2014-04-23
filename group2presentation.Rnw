@@ -104,19 +104,21 @@ whitemom & Whether mother's ethnicity is white or not white & 2-level factor \\
 \item Could be analyzed as a continuous or categorical response
 \item Clear public health application
 \end{itemize}
-\vspace{3em}
+\vspace{1ex}
 \textbf{Full Model}
-\begin{itemize}
-\item Linear
+\begin{columns}
+\column{.8\textwidth}
+
+\small
 <<lm.model, results='hide'>>=
-weight ~ mage + fage + weeks + visits + gained + habit + whitemom + marital + gender
+lm(weight ~ mage + fage + weeks + visits + gained + habit + whitemom + marital + gender, data=births)
 @
-\item Logistic
+
 <<glm.model, results='hide'>>=
-weight ~ mage + fage + weeks + visits + gained + habit + whitemom + marital + gender 
-family='binomial'
+glm(lowbirthweight ~ mage + fage + weeks + visits + gained + habit + whitemom + marital + gender, data=births, family='binomial')
 @
-\end{itemize}
+
+\end{columns}
 \end{frame}
 
 
