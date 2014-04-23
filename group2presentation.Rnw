@@ -41,6 +41,7 @@ require(rpart.plot)
 <<echo=FALSE>>=
 births = getURL("https://raw.githubusercontent.com/mmallek/finalproject/master/ncbirths.txt",ssl.verifypeer=FALSE, followlocation=1L, .opts=curlOptions(sslversion=3))
 births = read.table(text=births, sep='\t', header=TRUE)
+attach(births)
 @
 
 \begin{frame}
@@ -125,26 +126,186 @@ glm(lowbirthweight ~ mage + fage + weeks + visits + gained + habit + whitemom + 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}{Sara: Variable Selection and Model Diagnostics}
-- Define method \\
-- Name r packages used \\
-- Describe process \\
-- Success and failure? \\
-- Conclusions/Lessons Learned \\
+
+\textbf{Goals}\\
+\begin{itemize}
+\item
+Write algorithm to run exhaustive model selection \\
+\item
+Compare models chosen by different selection criterion \\
+\item
+Check model diagnostics - Was the class of models explored appropriate? \\
+\item
+Discuss challenges of model selection \\
+\end{itemize}
 
 \end{frame}
 
+\begin{frame}{Sara: Variable Selection and Model Diagnostics}
+
+\textbf{Class of models considered in this analysis:} \\
+\begin{itemize}
+\item
+All possible subsets of variables \\
+\end{itemize}
+
+\textbf{Criterion used:} \\
+\begin{itemize}
+\item
+Akaike Information Criterion (AIC) \\
+\item
+Bayes Information Criterion (BIC) \\
+\item
+Adjusted R squared \\
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile, allowframebreaks]{Sara: Variable Selection and Model Diagnostics}
+\textbf{The algorithm} \\
+There were 10 possible predictor variables considered in analysis of \emph{NCbirths}. To make it simpler, 4 variables are considered here.\\
+\medskip
+Creates a matrix where each $row_i$ corresponds to one possible combination of predictor variables \\
+% Having trouble displaying output
+<<echo=FALSE>>=
+
+# the variable names we want to consider in the model
+vars <- c("gained","premie","habit","whitemom")
+
+# create combinations (one column = one possible combination)
+one <- combn(vars,1)
+two <- combn(vars,2)
+three <- combn(vars,3)
+four <- combn(vars,4)
+
+ones <- cbind(t(one),0,0,0)
+twos <- cbind(t(two),0,0)
+threes <- cbind(t(three),0)
+fours <- t(four)
+
+combos <- rbind(ones,twos,threes,fours)
+threes
+@
+
+\end{frame}
+
+
+\begin{frame}[fragile, allowframebreaks]{Sara: Variable Selection and Model Diagnostics}
+
+Iterate through the rows of the matrix and fit a linear model, with $weight$ as the response variable \\
+<<echo=FALSE>>=
+mat <- matrix(NA, nrow=15, ncol=3)
+colnames(mat) <- c("AIC", "BIC","Adj R^2")
+out <- list()
+@
+\small
+<<>>=
+for (i in 1:15){
+  rowi0 <- combos[i,]
+  rowi <- rowi0[rowi0 != 0]
+  datai <- as.data.frame(cbind(births[,rowi],births[,"weight"]))
+  names(datai) <- c(rowi,"weight")
+  mi <- lm(datai$weight~.,data=datai)
+  mat[i,] <- c(AIC(mi),BIC(mi),summary(mi)$adj.r.squared)
+  out[[i]] <- summary(mi)$coef
+  }
+@
+
+
+\end{frame}
+
+\begin{frame}[fragile,allowframebreaks]{Sara: Variable Selection and Model Diagnostics}
+
+<<>>=
+# order of linear models based on AIC 
+order(mat[,1])
+# order of linear models based on BIC 
+order(mat[,2])
+# order of linear models based on adjusted R^2 
+order(mat[,3])
+@
+
+
+\end{frame}
+
+\begin{frame}[fragile,allowframebreaks]{Sara: Variable Selection and Model Diagnostics}
+Best model according to AIC and BIC
+<<>>=
+out[[15]]
+@
+\end{frame}
+
+\begin{frame}[fragile,allowframebreaks]{Sara: Variable Selection and Model Diagnostics}
+Best model according to adjusted $R^2$
+<<>>=
+out[[14]]
+@
+
+Note: Lab exercises explore what to do next...
+\end{frame}
+
+\begin{frame}{Sara: Variable Selection and Model Diagnostics}
+
+\textbf{Limitations}
+\begin{itemize}
+\item
+This method does not consider transformations of variables or interactions \\
+\item
+Model selection is subjective - which criterion is best? - how would you select a model? \\
+\item
+Differences between possible models are subtle \\
+\item
+In the actual analysis, wanted to be able to interpret betas, but models were stronger with transformations and interactions - difficult interpretation \\
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{frame}{Jon: Variable Selection and Model Diagnostics}
+
+
+\textbf{Regression and Variable Selection}
+\begin{itemize}
+\item  A regression is a functional relationship between a covariate (predictor) of interest and an outcome of interest. 
+\item  One variable can help us predict the value of another variable.
+\item The all possible regressions approach looks at all possible combinations or subsets of each and all predictor variables 
+\item Fitting the criteria to AIC and BIC to find a good model
+\end{itemize}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Jon: Variable Selection and Model Diagnostics}
+
+\textbf{Residuals and Leverage}
+\begin{itemize}
+\item  Determine whether our model assumptions can be used before making an inference
+\item  Look for violations and look for the consequential inferential procedures 
+\item Combines both graphical and statistical methods. 
+\item Leverage = ability to move a regression model by itself by moving in the y direction.  
+\item Leverage is always between one and zero 
+\item Zero means there is no effect on regression model 
+
+\end{itemize}
+\end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}{Jon: Variable Selection and Model Diagnostics}
-- Define method \\
-- Name r packages used \\
-- Describe process \\
-- Success and failure? \\
-- Conclusions/Lessons Learned \\
 
+\textbf{Cooke's Distance}
+\begin{itemize}
+\item  Cook's Distance is a measure of the influence an observation has on a fitted line. 
+\item The Cook's Distance of the ith observation can be calculated using the following formula:
+\item $\frac{r_{i^2}}{p}$ X $\frac{H_{ii}}{1-H_{ii}}$
+\item $r_i$ is the value of the {standardised residual} of the ith observation
+\item p is the number of parameters and Hii is the ith diagonal term in the Hat Matrix
 
+\end{itemize}
 \end{frame}
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -170,7 +331,6 @@ glm(lowbirthweight ~ mage + fage + weeks + visits + gained + habit + whitemom + 
 \begin{itemize}
 \item Used factored weight variable: split on 5.5 lbs (biologically relevant)
 \item Initially used tree package
-
 \item Pruned with 10-fold cross-validation
 \item Output dissatisfying
 \end{itemize}
