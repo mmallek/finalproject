@@ -289,7 +289,18 @@ In the actual analysis, wanted to be able to interpret betas, but models were st
 \end{itemize}
 \end{frame}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{}
+<<echo=FALSE,fig.height=3.5,fig.width=3.5>>=
+
+results<-(lm(weight ~ weeks+gender,births))
+lev<-hat(model.matrix(results))
+plot(lev,col="blue")
+
+
+@
+\vspace{1.5em}
+\end{frame}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
