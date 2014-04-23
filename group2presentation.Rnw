@@ -34,8 +34,6 @@ theme_set(theme_bw())
 <<echo=FALSE, message=FALSE>>=
 require(rpart)
 require(tree)
-require(rattle)
-require(rpart.plot)
 @
 % Load data
 <<echo=FALSE>>=
@@ -90,7 +88,7 @@ whitemom & Whether mother's ethnicity is white or not white & 2-level factor \\
 \end{tabular}
 
 \vspace{1.5em}
-\tiny * These variables were also coerced into 2-level factors
+* These variables were also coerced into 2-level factors
 
 \end{frame}
 
@@ -423,24 +421,9 @@ lowbirthweight ~ fage + mage + marital + gender + habit + whitemom
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{frame}[fragile]{Testing}
-
-<<test>>=
-temp = 1 + 2
-temp
-
-@
-
-
-
-\end{frame}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 \begin{frame}{Conclusions}
 
-- [Do our individual results agree?]\\
+- Most important variable: weeks\\
 - Lessons learned \\
     - Subjective process \\
     - Prediction is difficult \\
