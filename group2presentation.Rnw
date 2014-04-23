@@ -1,0 +1,109 @@
+\documentclass[12pt]{beamer}
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+%\usepackage{xmpmulti}
+
+\usetheme{Madrid}     % only has title/name/date/slide# at bottom
+
+\usecolortheme{beaver}% beaver is maroon
+\definecolor{pastelpink}{rgb}{0.961, .906,.906}
+\setbeamertemplate{navigation symbols}{}  % optionally hide navigation buttons 
+
+
+\title[Group 2 Presentation]{Exploration and Analysis of \\ OpenIntro's ``NCBirths'' Dataset}
+\author[Chiang, Mallek, Nu\~nez, Valenzuela]{Jon Chiang, Maritza Mallek, Sara Nu\~nez, Steele Valenzuela}
+\institute[]{PUBHLTH 690R: Statistical Modeling and Data Visualization}
+\date{24 April 2014}
+
+%\setbeamercolor{author}{fg=white}
+%\setbeamercolor{institute}{fg=white}
+%\setbeamercolor{date}{fg=white}
+
+\begin{document}
+
+
+\begin{frame}
+    \titlepage
+
+    %\vspace{-10ex}
+\end{frame} 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Introduction}
+\large
+\textbf{Overview of Data}
+\begin{itemize}
+\item Data obtained from OpenIntro
+\item Births in North Carolina
+\item Random sample of 1000 observations
+\item 13 variables
+\end{itemize}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Introduction}
+
+\footnotesize
+
+\begin{tabular}{|lp{7cm}l|}
+\hline
+\textbf{Variable} & \textbf{Definition} & \textbf{Format}\\
+\hline
+fage & Father’s age in years & integer \\
+mage* & Mother’s age in years & integer\\
+weeks* & Length of pregnancy in weeks & integer\\
+visits & Number of hospital visits during pregnancy & integer\\
+gained & Weight gained by mother during pregnancy in pounds & integer \\
+weight* & Weight of the baby at birth in pounds & numeric \\
+gender & Gender of the baby, female or male & 2-level factor \\
+habit & Status of the mother as a nonsmoker or a smoker & 2-level factor  \\
+marital & Whether mother is married or not married at birth & 2-level factor \\
+whitemom & Whether mother's ethnicity is white or not white & 2-level factor \\
+\hline
+\end{tabular}
+
+\vspace{1.5em}
+\tiny * These variables were also coerced into 2-level factors
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Introduction}
+
+\textbf{Response Variable: birth weight of baby}
+\begin{itemize}
+\item No missing values
+\item Could be analyzed as a continuous or categorical response
+\item Clear public health application
+\end{itemize}
+\vspace{3em}
+\textbf{Full Model}
+\scriptsize
+
+<<eval=FALSE, tidy=TRUE, tidy.opts=list(width.cutoff=20)>>=
+lm(weight ~ mage + fage + weeks + visits + gained + habit + whitemom + marital + gender)
+@
+
+<<eval=FALSE, tidy=TRUE>>=
+glm(lowbirthweight ~ mage + fage + weeks + visits + gained + habit + whitemom + marital + gender, family=binomial)
+@
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+
+
+\end{document}
