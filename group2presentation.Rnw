@@ -41,6 +41,7 @@ require(rpart.plot)
 <<echo=FALSE>>=
 births = getURL("https://raw.githubusercontent.com/mmallek/finalproject/master/ncbirths.txt",ssl.verifypeer=FALSE, followlocation=1L, .opts=curlOptions(sslversion=3))
 births = read.table(text=births, sep='\t', header=TRUE)
+attach(births)
 @
 
 \begin{frame}
@@ -125,15 +126,105 @@ glm(lowbirthweight ~ mage + fage + weeks + visits + gained + habit + whitemom + 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}{Sara: Variable Selection and Model Diagnostics}
-- Define method \\
-- Name r packages used \\
-- Describe process \\
-- Success and failure? \\
-- Conclusions/Lessons Learned \\
+
+\textbf{Goals}\\
+\begin{itemize}
+\item
+Write algorithm to run exhaustive model selection \\
+\item
+Compare models chosen by different selection criterion \\
+\item
+Check model diagnostics - Was the class of models explored appropriate? \\
+\item
+Discuss challenges of model selection \\
+\end{itemize}
 
 \end{frame}
 
+\begin{frame}{Sara: Variable Selection and Model Diagnostics}
 
+\textbf{Class of models considered in this analysis:} \\
+\begin{itemize}
+\item
+All possible subsets of variables \\
+\end{itemize}
+
+\textbf{Criterion used:} \\
+\begin{itemize}
+\item
+Akaike Information Criterion (AIC) \\
+\item
+Bayes Information Criterion (BIC) \\
+\item
+Adjusted R squared \\
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Sara: Variable Selection and Model Diagnostics}
+
+\textbf{The algorithm} \\
+There were 10 possible predictor variables considered in analysis of \emph{NCbirths}. To make it simpler, 4 variables are considered here.\\
+\medskip
+1. Creates a matrix where each $row_i$ corresponds to one possible combination of predictor variables \\
+% Having trouble displaying output
+<<echo=FALSE>>=
+
+# the variable names we want to consider in the model
+vars <- c("gained","premie","habit","whitemom")
+
+# create combinations (one column = one possible combination)
+one <- combn(vars,1)
+two <- combn(vars,2)
+three <- combn(vars,3)
+four <- combn(vars,4)
+
+ones <- cbind(t(one),0,0,0)
+twos <- cbind(t(two),0,0)
+threes <- cbind(t(three),0)
+fours <- t(four)
+
+combos <- rbind(ones,twos,threes,fours)
+# threes
+@
+
+\end{frame}
+
+\begin{frame}{Sara: Variable Selection and Model Diagnostics}
+
+2. Iterate through the rows of the matrix and fit a linear model, with $weight$ as the response variable \\
+<<echo=FALSE>>=
+mat <- matrix(NA, nrow=15, ncol=3)
+colnames(mat) <- c("AIC", "BIC","Adj R^2")
+out <- list()
+@
+
+% Having trouble displaying code
+% insert 'for loop' here
+
+\end{frame}
+
+\begin{frame}{Sara: Variable Selection and Model Diagnostics}
+
+3. Find the models with smallest AIC and BIC values, and largest adjusted R squared value\\
+
+% display orders here
+% display one out[[]] just to show it
+
+\end{frame}
+
+\begin{frame}{Sara: Variable Selection and Model Diagnostics}
+
+\textbf{Limitations}
+\begin{itemize}
+\item
+This method does not consider transformations of variables or interactions \\
+\item
+Model selection is subjective - which criterion is best? - how would you select a model? \\
+\item
+In the actual analysis, wanted to be able to interpret betas, but models were stronger with transformations and interactions - difficult interpretation \\
+\end{itemize}
+\end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}{Jon: Variable Selection and Model Diagnostics}
@@ -170,7 +261,6 @@ glm(lowbirthweight ~ mage + fage + weeks + visits + gained + habit + whitemom + 
 \begin{itemize}
 \item Used factored weight variable: split on 5.5 lbs (biologically relevant)
 \item Initially used tree package
-
 \item Pruned with 10-fold cross-validation
 \item Output dissatisfying
 \end{itemize}
