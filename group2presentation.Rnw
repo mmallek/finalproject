@@ -134,15 +134,52 @@ family='binomial'
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{frame}{Jon: Variable Selection and Model Diagnostics}
-- Define method \\
-- Name r packages used \\
-- Describe process \\
-- Success and failure? \\
-- Conclusions/Lessons Learned \\
 
+\begin{frame}{Jon: Variable Selection and Model Diagnostics}
+
+
+\textbf{Regression and Variable Selection}
+\begin{itemize}
+\item  A regression is a functional relationship between a covariate (predictor) of interest and an outcome of interest. 
+\item  One variable can help us predict the value of another variable.
+\item The all possible regressions approach looks at all possible combinations or subsets of each and all predictor variables 
+\item Fitting the criteria to AIC and BIC to find a good model
+\end{itemize}
 
 \end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Jon: Variable Selection and Model Diagnostics}
+
+\textbf{Residuals and Leverage}
+\begin{itemize}
+\item  Determine whether our model assumptions can be used before making an inference
+\item  Look for violations and look for the consequential inferential procedures 
+\item Combines both graphical and statistical methods. 
+\item Leverage = ability to move a regression model by itself by moving in the y direction.  
+\item Leverage is always between one and zero 
+\item Zero means there is no effect on regression model 
+
+\end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Jon: Variable Selection and Model Diagnostics}
+
+\textbf{Cooke's Distance}
+\begin{itemize}
+\item  Cook's Distance is a measure of the influence an observation has on a fitted line. 
+\item The Cook's Distance of the ith observation can be calculated using the following formula:
+\item $\frac{r_{i^2}}{p}$ X $\frac{H_{ii}}{1-H_{ii}}$
+\item $r_i$ is the value of the {standardised residual} of the ith observation
+\item p is the number of parameters and Hii is the ith diagonal term in the Hat Matrix
+
+\end{itemize}
+\end{frame}
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
