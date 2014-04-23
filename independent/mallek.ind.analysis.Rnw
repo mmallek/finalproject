@@ -43,7 +43,7 @@ births = read.table(text=births, sep='\t', header=TRUE)
 @
 
 %\subsection{Classification and Regression Trees (CART)}
-Classification and Regression Trees (CARTs) are a nonparametric approach to regression. CARTs are generated through binary recursive partitioning, in which each potential independent variable used to build the model is tested to obtain the value at which the most meaningful split between two branches can be created. The rules can vary within and among R packages, but the goal is usually to minimize a value such as the sum of squared residuals, Gini index, or misclassification rate. The recursive aspect occurs as this process is repeated for each branch of the tree until some predefined set of constraints are met, which stops the model. These constraints may include the number of observations in a node or marginal improvement in the value to be minimized. *At this point, the appropriate regression (logistic, in the case of a classification tree) can be run on the observations contained in each terminal node.*
+Classification and Regression Trees (CARTs) are a nonparametric approach to regression. CARTs are generated through binary recursive partitioning, in which each potential independent variable used to build the model is tested to obtain the value at which the most meaningful split between two branches can be created. The rules can vary within and among R packages, but the goal is usually to minimize a value such as the sum of squared residuals, Gini index, or misclassification rate. The recursive aspect occurs as this process is repeated for each branch of the tree until some predefined set of constraints are met, which stops the model. These constraints may include the number of observations in a node or marginal improvement in the value to be minimized. %*At this point, the appropriate regression (logistic, in the case of a classification tree) can be run on the observations contained in each terminal node.*
 
 Trees are popular because they are fairly intuitive to interpret, especially for non-statisticians, including in public health settings. At each node an equality is shown; for a given observation, if the inequality resolves as \textsc{true}, the reader follows the left branch. The alternative to CARTs is typically some form of parametric regression, such as GLM. For a doctor in a hospital, consulting a regression tree is much simpler than generating and interpreting a regression model. Because CARTs are nonparametric, we cannot use the results to explain why certain variable values result in the observed response, but in situations where we are interested in the likelihood and not necessarily interested in how to change an outcome, CARTs are a reasonable tool. They may be used for exploratory or predictive data analysis.
 
@@ -80,12 +80,12 @@ text(bt1.p, cex=0.8, all=TRUE)
 While the finding of \verb|weeks| as the key predictor of low birth weight is reasonable, it is not particularly interesting. A review of the variables used in the model shows that \verb|visits| and \verb|gained|, as well as \verb|weeks|, represent data recorded at the same time as \verb|weight|. Since we do not have information linked to gestational ages before birth, it seems disingenous to use these in a predictive framework. Given this reasoning, we proceed with the analysis, omitting these variables from our model specification. The new model is specified as:
 
 <<model2, results='hide'>>=
-lowbirthweight ~ fage + mage + mature + marital + gender + habit + whitemom
+lowbirthweight ~ fage + mage + marital + gender + habit + whitemom
 @
 
 
 <<echo=FALSE, include=FALSE>>=
-form2 = lowbirthweight ~ fage + mage + mature + marital + gender + habit + whitemom
+form2 = lowbirthweight ~ fage + mage  + marital + gender + habit + whitemom
 bt2 = tree(form2, data=births)
 @
 
@@ -142,6 +142,8 @@ fancyRpartPlot(bt3)
 
 
 %%%%%%%%%% keep?
+
+%try using key variables to build glm
 
 We also compared this tree to the predictive power of a generalized linear model (GLM) using logistic regression. We used the same initial model. Predictor variables hospital visits and weight gained were significant at the 0.01 level, while smoking and white mom were significant at the 0.1 level. All other variables did not show significance at the 0.1 or smaller level. 
 

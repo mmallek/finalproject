@@ -250,6 +250,20 @@ lowbirthweight ~ fage + mage + marital + gender + habit + whitemom
 
 \end{frame}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile]{Testing}
+
+<<test>>=
+temp = 1 + 2
+temp
+
+@
+
+
+
+\end{frame}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

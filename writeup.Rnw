@@ -90,21 +90,23 @@ lm(weight ~ mage + fage + weeks + visits + gained + habit + whitemom + marital +
 glm(lowbirthweight ~ mage + fage + weeks + visits + gained + habit + whitemom + marital + gender, family=binomial)
 @
 
-
-
 \begin{landscape}
 
 \begin{table}
 \centering
-\begin{tabular}{ccc}
+\begin{tabular}{lllll}
 \hline
-Continuous Variable & Two-level Factor & Equation with factor labels\\
+Continuous Variable & Two-level Factor & Equation with factor labels & Observations & NAs\\
 \hline
-mage & mature & younger mom $< 35 \text{ years}<=$ mature mom \\
-weeks & premie & premie $< 37 \text{ weeks}<= $ full term \\
-weight & lowbirthweight & low $<= 5.5 \text{ pounds}<$ not low
+mage & mature & younger mom $< 35 \text{ years}<=$ mature mom & 867/133 & 0\\
+weeks & premie & premie $< 37 \text{ weeks}<= $ full term & 846/152 & 2\\
+weight & lowbirthweight & low $<= 5.5 \text{ pounds}<$ not low & 111/889 & 0\\
+n/a & marital & married OR not married & 386/613 & 1\\
+n/a & whitemom & white OR not white & 714/284 & 2 \\
+n/a & habit & nonsmoker OR smoker & 873/126 & 1 \\
+n/a & gender & female OR male & 503/497 & 0 \\
 \end{tabular}
-\caption{Variable names and break points for cutting continuous data to assign data to categorical values.
+\caption{Factored variables.
 \label{table:factors}}
 \end{table}
 
@@ -132,48 +134,14 @@ gained & \multirow{2}{*}{\parbox{3cm}{weight gained by mother}} & 0 & 30 & 30.33
 weight & birth weight of baby & 1 & 7.31 & 7.101 & 11.750 & 0 & (7.007482,7.194518) & (2.08949,2.490288)\\
 \end{tabular}
 % This caption is dumb but I am not sure what to put here.
-\caption{Master table for summarizing data}
-\label{table:master}
+\caption{Continuous variables}
+\label{table:continuous}
 \end{table}
 
 \end{landscape}
 
 
-\begin{table}
-\begin{centering}
-\begin{tabular}{lll}
-\hline
-Variable & Factor & Counts \\
-\hline
-\multirow{3}{*}{marital} & married & 386 \\
-  & not married & 613 \\
-  & NAs & 1 \\
-  \hline
-\multirow{2}{*}{gender [of baby]} & female & 503 \\
-  & male & 497 \\
-  \hline
-\multirow{3}{*}{habit} & nonsmoker & 873 \\
-  & smoker & 126 \\
-  & NA & 1 \\
-  \hline
-\multirow{3}{*}{whitemom} & not white & 284 \\
-  & white & 714\\
-  & NA & 2 \\
-\hline
-\multirow{2}{*}{mature} & mature mom & 133 \\
- & younger mom & 867 \\
- \hline
-\multirow{3}{*}{premie} & full term & 846 \\
-  & premie & 152 \\
-  & NAs & 2 \\
-  \hline
-\multirow{2}{*}{lowbirthweight} & low & 111 \\
-  & not low & 889
-\end{tabular}
-\caption{Additional table for summarizing data}
-\label{table:binaries}
-\end{centering}
-\end{table}
+
 
 \section*{Original Plots from Rough Draft}
 Keeping these in the doc for now in case we want to use any of them in the final.
