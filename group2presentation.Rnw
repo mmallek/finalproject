@@ -329,6 +329,7 @@ In the actual analysis, wanted to be able to interpret betas, but models were st
 \begin{itemize}
 \item Used factored weight variable: split on 5.5 lbs (biologically relevant)
 \item Initially used tree package
+% move tree picture to here
 \item Pruned with 10-fold cross-validation
 \item Output dissatisfying
 \end{itemize}
@@ -410,15 +411,15 @@ lowbirthweight ~ fage + mage + marital + gender + habit + whitemom
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{frame}{Conclusions}
+\begin{frame}{Conclusion}
 
-- Most important variable: weeks\\
-- Lessons learned \\
-    - Subjective process \\
-    - Prediction is difficult \\
-    - One r package or function won't do the work for you \\
-- [Do we include this?] we hope to integrate across the individual projects by using each other's information: for example, running the other analyses with Steele's imputed data.\\
-
+\textbf{What did we learn?}
+\begin{itemize}
+\item Most important variable: weeks
+\item Subjective process \\
+\item Prediction is difficult \\
+\item One R package or function won't do the work for you \\
+\end{itemize}
 
 \end{frame}
 
