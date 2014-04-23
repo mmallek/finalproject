@@ -22,6 +22,26 @@
 
 \begin{document}
 
+% Load libraries
+<<echo=FALSE, message=FALSE>>=
+require(ggplot2)
+require(GGally)
+require(RCurl)
+require(knitr)
+theme_set(theme_bw())
+@
+% New libraries for indpendent project
+<<echo=FALSE, message=FALSE>>=
+require(rpart)
+require(tree)
+require(rattle)
+require(rpart.plot)
+@
+% Load data
+<<echo=FALSE>>=
+births = getURL("https://raw.githubusercontent.com/mmallek/finalproject/master/ncbirths.txt",ssl.verifypeer=FALSE, followlocation=1L, .opts=curlOptions(sslversion=3))
+births = read.table(text=births, sep='\t', header=TRUE)
+@
 
 \begin{frame}
     \titlepage
@@ -86,14 +106,85 @@ whitemom & Whether mother's ethnicity is white or not white & 2-level factor \\
 \end{itemize}
 \vspace{3em}
 \textbf{Full Model}
-\scriptsize
-
-<<eval=FALSE, tidy=TRUE, tidy.opts=list(width.cutoff=20)>>=
-lm(weight ~ mage + fage + weeks + visits + gained + habit + whitemom + marital + gender)
+\begin{itemize}
+\item Linear
+<<lm.model, results='hide'>>=
+weight ~ mage + fage + weeks + visits + gained + habit + whitemom + marital + gender
 @
+\item Logistic
+<<glm.model, results='hide'>>=
+weight ~ mage + fage + weeks + visits + gained + habit + whitemom + marital + gender 
+family='binomial'
+@
+\end{itemize}
+\end{frame}
 
-<<eval=FALSE, tidy=TRUE>>=
-glm(lowbirthweight ~ mage + fage + weeks + visits + gained + habit + whitemom + marital + gender, family=binomial)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Sara: Variable Selection and Model Diagnostics}
+- Define method \\
+- Name r packages used \\
+- Describe process \\
+- Success and failure? \\
+- Conclusions/Lessons Learned \\
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Jon: Variable Selection and Model Diagnostics}
+- Define method \\
+- Name r packages used \\
+- Describe process \\
+- Success and failure? \\
+- Conclusions/Lessons Learned \\
+
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Maritza: Classification and Regression Trees}
+
+\textbf{What are Trees?}
+\begin{itemize}
+\item Non parametric way to model a dataset. 
+\item Classification trees for $y$ as a categorical response
+\item Binary recursive partitioning used to subdivide dataset
+\item 2 primary packages in R: tree and rpart
+\end{itemize}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Maritza: Classification and Regression Trees}
+
+\textbf{Applying Classification Tree Method to this dataset}
+\begin{itemize}
+\item Used factored weight variable: split on 5.5 lbs (biologically relevant)
+\item Initially used tree package
+
+\item Pruned with 10-fold cross-validation
+\item Output dissatisfying
+\end{itemize}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Maritza: Classification and Regression Trees}
+\vspace{-3ex}
+<<tree1, echo=FALSE, fig.height=5.5>>=
+form1 = lowbirthweight ~ fage + mage + weeks + visits + marital + gained + gender + habit + whitemom
+bt1 = tree(form1, data = births)
+plot(bt1)
+text(bt1, cex=0.7, pretty=10)
 @
 
 \end{frame}
@@ -101,9 +192,78 @@ glm(lowbirthweight ~ mage + fage + weeks + visits + gained + habit + whitemom + 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\begin{frame}{Maritza: Classification and Regression Trees}
+<<tree2, echo=FALSE, fig.height=4>>=
+bt1.cv = cv.tree(bt1)
+bt1.p = prune.tree(bt1, best=3)
+plot(bt1.p)
+text(bt1.p, cex=1)
+@
+
+\end{frame}
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Maritza: Classification and Regression Trees}
+
+\textbf{Prediction?}
+\begin{itemize}
+\item Seems obvious that weeks would predict low birth weight
+\item What about variables not directly associated with pregnancy?
+\item Is it fair to include predictors that are measured at the same time as the response?
+\item Revised model:
+\end{itemize}
+<<model2, results='hide'>>=
+lowbirthweight ~ fage + mage + marital + gender + habit + whitemom
+@
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Maritza: Classification and Regression Trees}
+\textbf{Results}
+\begin{itemize}
+\item Split once, on marital
+\item Neither node contained a majority of ``low birth weight''
+\item Next step is to adjust stopping criteria
+\item All variables but gender used, but high deviance
+\item Therefore we have a negative result for this dataset: anticipated predictors, such as marital status, smoking, age, and ethnicity, turned out not to be important - at least not detectable by the tree
+\item Use trees with caution! Results indicate other data (not collected) may contain important predictors.
+\end{itemize}
+\end{frame} 
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Steele: Imputation}
+
+- Define method \\
+- Name r packages used \\
+- Describe process \\
+- Success and failure? \\
+- Conclusions/Lessons Learned \\
+
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Conclusions}
+
+- [Do our individual results agree?]\\
+- Lessons learned \\
+    - Subjective process \\
+    - Prediction is difficult \\
+    - One r package or function won't do the work for you \\
+- [Do we include this?] we hope to integrate across the individual projects by using each other's information: for example, running the other analyses with Steele's imputed data.\\
+
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \end{document}
