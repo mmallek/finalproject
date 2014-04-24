@@ -28,6 +28,9 @@ require(ggplot2)
 require(GGally)
 require(RCurl)
 require(knitr)
+require(Hmisc)
+require(Amelia)
+require(Zelig)
 theme_set(theme_bw())
 @
 % New libraries for indpendent project
@@ -449,17 +452,112 @@ text(bt2.adj.p, cex=0.6, all=TRUE, pretty=10)
 \end{itemize}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}{Steele: Imputation}
-
-- Define method \\
-- Name r packages used \\
-- Describe process \\
-- Success and failure? \\
-- Conclusions/Lessons Learned \\
-
+\begin{frame}{Steele: Missing Values \& Imputation}
+\textbf{Find, Visualize, and Analyze}
+\begin{itemize}
+\item
+Installed R packages Hmisc, Amelia, and Zelig \\
+\item
+What can we do when have missing values/NA's? \\
+\item
+What did you all do for the Titanic Project? \\
+\end{itemize}
 
 \end{frame}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile, allowframebreaks]{Finding Missing Data}
+\textbf{NA functions are really useful}
+\footnotesize
+<<>>=
+missing <- is.na(births) #TRUE indicates NA's
+sum(missing) #total number of NA's
+nrow(na.omit(births)) #number of rows w/ NA excluded
+head(births[!complete.cases(births),1:7], 2) #displays NA rows
+@
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]{Visuals-Missingness Map}
+<<echo=FALSE, fig.height=3, fig.width=6, message=FALSE>>=
+ggmissing(births)
+@
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]{Visuals-In the Margins}
+<<echo=FALSE>>=
+min.age <- with(births, min(fage, na.rm=T))
+tenprcnt.min.age <- (90/100)*min.age 
+births$imputed.fage <- impute(births$fage, fun=tenprcnt.min.age)
+@
+
+<<echo=FALSE, fig.height=3, fig.width=4>>=
+qplot(imputed.fage, mage, data=births, geom=c("point", "jitter"), color=I("purple"), size=I(3), alpha=I(.4), xlab="Imputed Father's Age", ylab="Mother's Age")+scale_y_continuous(breaks=seq(10, 50, 5))+scale_x_continuous(breaks=seq(10,50,5))
+@
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile]{Comparing Coefficient Estimates}
+\scriptsize
+Let's compare our group model with the imputed model.
+<<echo=TRUE, message=FALSE, results='hide'>>=
+group.model <- lm(weight~fage+mage+weeks+visits+marital+gained+gender+habit+whitemom, data=births)
+
+imp.births <- amelia(x=births, m=10, idvars="imputed.fage", noms=c("mature", "premie", "lowbirthweight", "marital", "gender", "habit", "whitemom"))
+
+imp.group.model <- zelig(weight~fage+mage+weeks+visits+marital+gained+gender+habit+whitemom, 
+data=imp.births$imputations, model="ls")
+@
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]{Visual of Coefficient Estimates}
+<<echo=FALSE, fig.height=4, fig.width=8>>=
+b.out<-NULL
+se.out<-NULL
+
+for(i in 1:imp.births$m) { # Replicate the model on each imputed dataset
+ols.out <- lm(weight~fage+mage+weeks+visits+marital+gained+gender+habit+whitemom,
+data = imp.births$imputations[[i]])
+b.out <- rbind(b.out, ols.out$coef)
+se.out <- rbind(se.out, coef(summary(ols.out))[,2])
+}
+
+combined.results <- mi.meld(q=b.out, se=se.out)
+
+lwdFrame <- data.frame(Variable = rownames(summary(group.model)$coef),
+Coef = summary(group.model)$coef[, 1],
+SE = summary(group.model)$coef[, 2],
+Method = "listwiseDelete")
+
+midFrame <- data.frame(Variable = colnames(combined.results$q),
+Coef = c(combined.results$q),
+SE = c(combined.results$se),
+Method = "imputation")
+
+resultFrame <- data.frame(rbind(lwdFrame, midFrame))
+
+zp1 <- ggplot(resultFrame, aes(colour = Method))
+
+zp1 <- zp1 + geom_hline(yintercept = 0, colour = gray(1/2), lty = 2)
+
+zp1 <- zp1 + geom_linerange(aes(x = Variable, ymin = Coef - SE*1,
+ymax = Coef + SE*1),
+lwd = 1, position = position_dodge(width = 1/2))
+
+zp1 <- zp1 + geom_pointrange(aes(x = Variable, y = Coef,
+ymin = Coef - SE*2, ymax = Coef + SE*2),
+lwd = 1/2, position = position_dodge(width = 1/2),
+shape = 21, fill = "WHITE")
+
+zp1 <- zp1 + coord_flip() + theme_bw()
+
+zp1 <- zp1 + ggtitle("Comparing coefficient estimates by missing data methods")
+
+zp1
+@
+
+\end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}{Conclusion}
