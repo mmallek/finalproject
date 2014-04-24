@@ -97,7 +97,7 @@ whitemom & Whether mother's ethnicity is white or not white & 2-level factor \\
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{frame}{Introduction}
+\begin{frame}[fragile]{Introduction}
 
 \textbf{Response Variable: birth weight of baby}
 \begin{itemize}
@@ -107,19 +107,20 @@ whitemom & Whether mother's ethnicity is white or not white & 2-level factor \\
 \end{itemize}
 \vspace{1ex}
 \textbf{Full Model}
-\begin{columns}
-\column{.8\textwidth}
+\begin{itemize}
+\item Uses all unique variables (no duplicating mature and mage, for example)
+\end{itemize}
 
-\small
-<<lm.model, results='hide'>>=
-lm(weight ~ mage + fage + weeks + visits + gained + habit + whitemom + marital + gender, data=births)
+\scriptsize
+<<lm.model, results='hide', tidy.opts=list(keep.blank.line=FALSE, width.cutoff=10)>>=
+lm(weight ~ mage + fage + weeks + visits + gained + 
+       habit + whitemom + marital + gender, data=births)
 @
 
-<<glm.model, results='hide'>>=
+<<glm.model, results='hide', tidy.opts=list(keep.blank.line=FALSE, width.cutoff=10)>>=
 glm(lowbirthweight ~ mage + fage + weeks + visits + gained + habit + whitemom + marital + gender, data=births, family='binomial')
 @
 
-\end{columns}
 \end{frame}
 
 
@@ -304,7 +305,8 @@ plot(lev,col="blue")
 \end{frame}
 
 
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%     MARITZA     %%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}{Jon: Model Diagnostics}
 
@@ -327,25 +329,16 @@ plot(lev,col="blue")
 \textbf{What are Trees?}
 \begin{itemize}
 \item Non parametric way to model a dataset. 
-\item Classification trees for $y$ as a categorical response
 \item Binary recursive partitioning used to subdivide dataset
+\item Classification trees used when $y$ is a categorical response
 \item 2 primary packages in R: tree and rpart
 \end{itemize}
-
-\end{frame}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{frame}{Maritza: Classification and Regression Trees}
-
-\textbf{Applying Classification Tree Method to this dataset}
+\vspace{4ex}
+\textbf{Application}
 \begin{itemize}
-\item Used factored weight variable: split on 5.5 lbs (biologically relevant)
-\item Initially used tree package
-% move tree picture to here
-\item Pruned with 10-fold cross-validation
-\item Output dissatisfying
+\item Response variable: low birth weight (```low'' or ``not low'')
+\item Less than 5.5 lbs considered low (biologically relevant)
+\item Initially used tree package, defaults
 \end{itemize}
 
 \end{frame}
@@ -353,9 +346,15 @@ plot(lev,col="blue")
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \begin{frame}{Maritza: Classification and Regression Trees}
-\vspace{-3ex}
-<<tree1, echo=FALSE, fig.height=5.5>>=
+
+\textbf{Initial tree output}
+\vspace{-6.5ex}
+<< echo=FALSE, fig.height=5.8>>=
 form1 = lowbirthweight ~ fage + mage + weeks + visits + marital + gained + gender + habit + whitemom
 bt1 = tree(form1, data = births)
 plot(bt1)
@@ -366,8 +365,12 @@ text(bt1, cex=0.7, pretty=10)
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 \begin{frame}{Maritza: Classification and Regression Trees}
+
+%\begin{itemize}
+
+\textbf{Next step: prune using 10-fold cross-validation}
+%\end{itemize}
 <<tree2, echo=FALSE, fig.height=4>>=
 bt1.cv = cv.tree(bt1)
 bt1.p = prune.tree(bt1, best=3)
@@ -379,15 +382,18 @@ text(bt1.p, cex=1)
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}{Maritza: Classification and Regression Trees}
+\begin{frame}[fragile]{Maritza: Classification and Regression Trees}
 
 \textbf{Prediction?}
+
 \begin{itemize}
 \item Seems obvious that weeks would predict low birth weight
 \item What about variables not directly associated with pregnancy?
 \item Is it fair to include predictors that are measured at the same time as the response?
 \item Revised model:
 \end{itemize}
+
+\footnotesize
 <<model2, results='hide'>>=
 lowbirthweight ~ fage + mage + marital + gender + habit + whitemom
 @
@@ -397,21 +403,66 @@ lowbirthweight ~ fage + mage + marital + gender + habit + whitemom
 
 \begin{frame}{Maritza: Classification and Regression Trees}
 \textbf{Results}
+
 \begin{itemize}
 \item Split once, on marital
 \item Neither node contained a majority of ``low birth weight''
-\item Next step is to adjust stopping criteria
-\item All variables but gender used, but high deviance
-\item Therefore we have a negative result for this dataset: anticipated predictors, such as marital status, smoking, age, and ethnicity, turned out not to be important - at least not detectable by the tree
-\item Use trees with caution! Results indicate other data (not collected) may contain important predictors.
 \end{itemize}
+
+\vspace{-6ex}
+<<echo=FALSE, include=TRUE, fig.height=3, fig.width=4>>=
+form2 = lowbirthweight ~ fage + mage  + marital + gender + habit + whitemom
+bt2 = tree(form2, data=births)
+plot(bt2)
+text(bt2, cex=1, all=TRUE, pretty=8)
+@
+\vspace{-10ex}
+\begin{itemize}
+\item Next step is to adjust stopping criteria
+\end{itemize}
+
 \end{frame} 
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+
+\begin{frame}{Maritza: Classification and Regression Trees}
+
+\small
+\begin{columns}
+\column{0.35\textwidth}
+\textbf{Results}
+\begin{itemize}
+    \item Reran analysis, including pruning, cross-validation
+    \item Tree uses 5/6 variables 
+    \item High overall deviance (which we want to minimize)
+    \item No terminal nodes predicting low birth weight!
+\end{itemize}
+
+\column{0.65\textwidth}
+<<echo=FALSE, include=TRUE, fig.height=6, fig.width=6>>=
+bt2.adj = tree(form2, data=births, control=tree.control(1000, mincut=5, minsize=10, mindev=0.005))
+bt2.adj.cv = cv.tree(bt2.adj)
+bt2.adj.p = prune.tree(bt2.adj, best=which.min(bt2.adj.cv$dev))
+plot(bt2.adj.p)
+text(bt2.adj.p, cex=0.6, all=TRUE, pretty=10)
+@
+\end{columns}
+\end{frame} 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\begin{frame}{Maritza: Classification and Regression Trees}
+\textbf{Conclusions}
+\begin{itemize}
+\item We have a negative result for this dataset
+    \begin{itemize}
+    \item Marital status, smoking, age, and ethnicity not very important 
+    \item Or, at least not detectable by the tree
+    \end{itemize}
+\item Use trees with caution! 
+\item Results indicate other (uncollected) data may contain important predictors.
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}{Steele: Imputation}
 
 - Define method \\
