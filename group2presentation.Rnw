@@ -343,6 +343,7 @@ plot(lev,col="blue")
 \begin{itemize}
 \item Used factored weight variable: split on 5.5 lbs (biologically relevant)
 \item Initially used tree package
+% move tree picture to here
 \item Pruned with 10-fold cross-validation
 \item Output dissatisfying
 \end{itemize}
@@ -424,6 +425,7 @@ lowbirthweight ~ fage + mage + marital + gender + habit + whitemom
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+<<<<<<< HEAD
 \begin{frame}[fragile]{Testing}
 
 <<test>>=
@@ -446,6 +448,19 @@ temp
     - Subjective process \\
     - Prediction is difficult \\
     - One r package or function won't do the work for you \\
+=======
+\begin{frame}{Conclusion}
+
+\textbf{What did we learn?}
+\begin{itemize}
+\item Most important variable: weeks
+\item Subjective process \\
+\item Prediction is difficult \\
+\item One R package or function won't do the work for you \\
+\end{itemize}
+\vspace{2ex}
+\textbf{Questions?}
+>>>>>>> c805dfddc54b1024a02ac8fb00b4dc194381a16b
 
 \end{frame}
 
