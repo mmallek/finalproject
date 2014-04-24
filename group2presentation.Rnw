@@ -108,10 +108,8 @@ whitemom & Whether mother's ethnicity is white or not white & 2-level factor \\
 \begin{itemize}
 \item Uses all unique variables (no duplicating mature and mage, for example)
 \end{itemize}
-%\begin{columns}
-%\column{.8\textwidth}
 
-\small
+\scriptsize
 <<lm.model, results='hide', tidy.opts=list(keep.blank.line=FALSE, width.cutoff=10)>>=
 lm(weight ~ mage + fage + weeks + visits + gained + 
        habit + whitemom + marital + gender, data=births)
@@ -121,7 +119,6 @@ lm(weight ~ mage + fage + weeks + visits + gained +
 glm(lowbirthweight ~ mage + fage + weeks + visits + gained + habit + whitemom + marital + gender, data=births, family='binomial')
 @
 
-%\end{columns}
 \end{frame}
 
 
