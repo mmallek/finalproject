@@ -420,6 +420,8 @@ lowbirthweight ~ fage + mage + marital + gender + habit + whitemom
 \item Prediction is difficult \\
 \item One R package or function won't do the work for you \\
 \end{itemize}
+\vspace{2ex}
+\textbf{Questions?}
 
 \end{frame}
 
