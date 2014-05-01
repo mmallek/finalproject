@@ -78,7 +78,7 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
 }
 @
 
-\section*{Data Description: NCbirths}
+\section{Data Description: NCbirths}
 This dataset was acquired from OpenIntro.org's free collection. According to the metadata, `ncbirths' was released in 2004 by North Carolina. This data set has been of interest to medical researchers who are studying the relation between habits and practices of expectant mothers and the birth of their children. The data provided by OpenIntro is a random sample of 1,000 cases from this data set.
 
 Of the 13 variables presented in the dataset, there are several options for thinking about predictors vs. response variables. Some of these are clearly predictors: fage, mage, marital, habit, gender, whitemom. Others could be considered either predictors or responses: weeks, premie, visits, gained, weight (or lowbirthweight). Based on the dataset description, which states that the research was exploring "habits and practices of expectant mothers," our inference is that habits and practices refer to weight gained by the mother and the smoking status of the mother (possibly marital status as well). The most likely responses are hospital visits, weeks (related to premie), and weight (related to lowbirthweight). An additional key characteristic of this dataset is that 6 of the variables are pairs of continuous and categorical data (see Table \ref{table:factors}).
@@ -140,6 +140,227 @@ weight & birth weight of baby & 1 & 7.31 & 7.101 & 11.750 & 0 & (7.007482,7.1945
 \end{table}
 
 \end{landscape}
+
+\section{Model Selection Analysis: Sara Nu\~nez}
+\subsection{Methods}
+\paragraph{}
+This analysis of the $\emph{NCbirths}$ data is concerned with the process of model selection and the differences between several selection criterion. In order to evaluate possible models, code was developed that implements model selection based on all possible subsets of 10 of the 12 possible predictor variables in the dataset. Father's age was not considered in this analysis, as it had a large number of missing values (NAs = 171). Low birth weight was also excluded from analysis, as baby's weight was the response variable under consideration. The goal of this analysis is to create an algorithm that does exhaustive model selection and compare models based on different selection criterion.
+\subsection{Model Selection Criterion}
+\paragraph{}
+The criterion used in this analysis were Akaike Information Criterion (AIC), Bayes Information Criterion (BIC) and adjusted R squared.
+\newline
+\newline
+\begin{tabular}{|r|r|r|}
+\hline
+Akaike Information Criterion (AIC)&Bayes Information Criterion (BIC)&Adjusted R squared\\
+\hline
+ & &  \\
+$= nlog(RSS/n) + 2(p+1)$&$= nlog(RSS/n) + (p+1)log(n)$&$= 1 - \frac{n-1}{n-p-1}(1-R^2)$\\
+ & &  \\
+\hline
+\end{tabular}
+
+\subsection{Model Selection Algorithm}
+The code that implemented model selection does the following:
+\begin{enumerate}
+\item 
+Creates a matrix where each $row_i$ corresponds to one possible combination of predictor variables
+\item
+Iterates through the rows of the matrix and fit a linear model, with $\emph{weight}$ as the response variable
+\item
+Stores the model summary coefficients and the AIC, BIC and adjusted $R^2$ values for each linear model
+\item
+Finds the 6 smallest AIC and BIC values as well as the 6 largest adjusted $R^2$ values
+\item
+Looks at diagnostic plots for model and individual variables
+\end{enumerate}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Code involved in this analysis %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+<<echo=FALSE>>=
+vars <- c("mage","mature","weeks","premie","visits","marital","gained","gender","habit","whitemom")
+one <- combn(vars,1)
+two <- combn(vars,2)
+three <- combn(vars,3)
+four <- combn(vars,4)
+five <- combn(vars,5)
+six <- combn(vars,6)
+seven <- combn(vars,7)
+eight <- combn(vars,8)
+nine <- combn(vars,9)
+ten <- combn(vars,10)
+
+ones <- cbind(t(one),0,0,0,0,0,0,0,0,0)
+twos <- cbind(t(two),0,0,0,0,0,0,0,0)
+threes <- cbind(t(three),0,0,0,0,0,0,0)
+fours <- cbind(t(four),0,0,0,0,0,0)
+fives <- cbind(t(five),0,0,0,0,0)
+sixes <- cbind(t(six),0,0,0,0)
+sevens <- cbind(t(seven),0,0,0)
+eights <- cbind(t(eight),0,0)
+nines <- cbind(t(nine),0)
+tens <- cbind(t(ten))
+
+
+combos <- rbind(ones,twos,threes,fours,fives,sixes,sevens,eights,nines,tens)
+mat <- matrix(NA, nrow=1023, ncol=3)
+colnames(mat) <- c("AIC", "BIC","Adj R^2")
+out <- list()
+
+for (i in 1:1023){
+  rowi0 <- combos[i,]
+  rowi <- rowi0[rowi0 != 0]
+  datai <- as.data.frame(cbind(births[,rowi],births[,"weight"]))
+  names(datai) <- c(rowi,"weight")
+  mi <- lm(datai$weight~.,data=datai)
+  mat[i,] <- c(AIC(mi),BIC(mi),summary(mi)$adj.r.squared)
+  out[[i]] <- summary(mi)$coef
+  }
+@
+<<echo=FALSE,eval=FALSE>>=
+# check that mat looks okay
+head <- head(mat)
+tail <- tail(mat)
+# order of the linear models based on AIC (listed smallest to largest)
+head(order(mat[,1]))
+# order of the linear models based on BIC (listed smallest to largest)
+head(order(mat[,2]))
+# find the largest adjust r squared
+tail(order(mat[,3]))
+
+# check models based on AIC and BIC results
+out[[833]]
+out[[1012]]
+@
+<<echo=FALSE>>=
+m833 <- lm(weight~weeks+premie+marital+gender+habit+whitemom,data=births)
+m1012 <- lm(weight~weeks+premie+visits+marital+gained+gender+habit+whitemom,data=births)
+@
+<<echo=FALSE,eval=FALSE>>=
+# AICs
+AIC(m833)
+AIC(m1012)
+
+# BICs
+BIC(m833)
+BIC(m1012)
+
+# plots
+plot(m833)
+plot(m1012)
+@
+
+\subsection{Results}
+\paragraph{}
+There were 1023 possible models to consider that were generated through the algorithm. After running through the code and looking at the three model criterion described above, there were two models of interest. Model 1012 had the smallest AIC and smallest BIC, while model 833 had the largest adjusted $R^2$. 
+\paragraph{}
+Because AIC and BIC values were in agreement that model 1012 was the best, and the adjusted $R^2$ values were similar for the two models, model 1012 was considered the best model using this method of selection. 
+\newline
+\newline
+The following is a summary of the chosen model:
+<<echo=FALSE>>=
+out[[1012]]
+@
+\paragraph{}
+Possible transformations were then explored for variables $\emph{weeks}$ and $\emph{visits}$, as both seem to have nonlinear relationships in the model. The transformed model was tested for curvature using the Tukey test ($p > .05$), and includes $premie$, $marital$, $gained$, $gender$, $habit$ and $whitemom$ as untransformed variables, and $weeks$ and $visits$ transformed. The transformed model also reduced AIC and BIC values and increased the adjusted $R^2$ coefficient (as compared to the original model).
+<<echo=FALSE>>=
+weeks2 <- (births[,"weeks"])^(1/8)
+visits2 <- (births[,"visits"])^(1/6)
+births2 <- cbind(births[,1:13],weeks2,visits2)
+t1012 <- lm(weight~weeks+weeks2+premie+visits+visits2+marital+gained+gender+habit+whitemom,data=births2)
+t833 <- lm(weight~weeks+weeks2+premie+marital+gender+habit+whitemom,data=births2)
+@
+<<echo=FALSE,eval=FALSE>>=
+# model 1012: transformed vs original
+AIC(t1012) # smaller AIC for model 1012
+AIC(m1012)
+BIC(t1012) # smaller BIC for model 1012
+BIC(m1012)
+summary(t1012)$adj.r.squared # higher adjusted R squared for model 1012
+summary(m1012)$adj.r.squared
+
+plot(t1012)
+@
+\paragraph{}
+Possible interactions between pairs of variables in this model were also considered. The interaction between $premie$ and $weeks$ was considered the strongest of all the possible pairs and enhanced the model criterion further. That is, AIC and BIC values were reduced by adding this interaction, and adjusted $R^2$ was increased. The following table summarizes the criterion for the original models considered and the final model reached through transformations of $weeks$ and $visits$ and adding the interaction between $weeks$ and $premie$ to model 1012.
+% final model summary
+<<echo=FALSE>>=
+mat2 <- matrix(NA, nrow=45, ncol=3)
+colnames(mat2) <- c("AIC", "BIC","Adj R^2")
+out2 <- list()
+
+for (i in 1:45){
+  rowi0 <- twos[i,]
+  rowi <- rowi0[rowi0 != 0]
+  datai <- as.data.frame(cbind(births[,rowi],births[,"weight"]))
+  names(datai) <- c(rowi,"weight")
+  mi <- lm(datai$weight~(datai[,1])*(datai[,2]),data=datai)
+  mat2[i,] <- c(AIC(mi),BIC(mi),summary(mi)$adj.r.squared)
+  out2[[i]] <- summary(mi)$coef
+  }
+@
+<<echo=FALSE,eval=FALSE>>=
+# order of AICs
+head(order(mat2[,1]))
+# order of BICs
+head(order(mat2[,2]))
+# order of adj R^2
+tail(order(mat2[,3]))
+
+# model 18 looks like the best possible model that considers an interaction
+# model
+out2[[18]]
+# what are the variables
+twos[18,]
+# weeks and premie
+@
+<<echo=FALSE>>=
+# try adding interaction to transformed model 1012
+tI1012 <- lm(weight~weeks+weeks2+premie+visits+visits2+marital+gained+gender+habit+whitemom + weeks*premie,data=births2)
+@
+<<echo=FALSE,eval=FALSE>>=
+# AIC comparison
+AIC(tI1012)
+AIC(t1012)
+# AIC value is smaller in this model with the interaction
+# BIC comparison
+BIC(tI1012)
+BIC(t1012)
+# BIC value is smaller in this model with the interaction
+# Adj R^2 comparison
+summary(tI1012)$adj.r.squared
+summary(t1012)$adj.r.squared
+# Adj R^2 is larger in this model with the interaction
+@
+\begin{center}
+\begin{tabular}{|r|r|r|r|}
+\hline
+Model&AIC&BIC&Adjusted $R^2$\\
+\hline
+Original 1012&2864.074&2912.767&0.475\\
+Original 833&2972.751&3011.981&0.493\\
+Final Model&\bf{2795.747}&\bf{2859.045}&\bf{0.513}\\
+\hline
+\end{tabular}
+\end{center}
+\subsection{Conclusions and Limitations}
+\paragraph{}
+Model selection is subjective and far from straightforward. Depending on what criterion one chooses to use, what the ultimate study goal is, and how exhaustive the model building process is, different models will be reached as appropriate. There is no one "best" model and often times criterion will disagree which models are more appropriate. The three plots below display fitted values against residuals for three separate models reached in this analysis. Differences are subtle and none are perfect.
+<<echo=FALSE,fig.height=2.5>>=
+par(mfrow = c(1, 3))
+plot(t1012,which=1,caption="Transformed Model 1012")
+plot(t833,which=1,caption="Transformed Model 833")
+plot(tI1012,which=1,caption="Final Model")
+@
+
+\paragraph{}
+There were multiple limitations of model selection found in this analysis. Transformations and interactions were considered after the model was selected. Intuitively, however, this should be done first. There is no guarantee that the model selected would have still been the most appropriate in comparison to the others had transformations and interactions been considered prior to iterating through all possible models. Another limitation found is that the predictor $visits$ is considered insignificant in the original model displayed above. Removing this variable, however, would give a different model (already considered in the algorithm) with significantly larger AIC and BIC values. Furthermore, in terms of the data, a linear model may not have been the best choice, as it appears constant variance may be violated in the final model reached in this analysis.
+\paragraph{}
+While this analysis did not reach a conclusive model to predict baby's weight or to have interpretable betas, it did explore the complexities of the exhaustive model selection process. Decisions on which model to build from are subjective and different criterion are used by different authors. In addition, models are built with the goal of the study in mind. By the end of this analysis, the model became less about the interpretation of the betas and more about trying to find a model that would best predict the response variable. Transformations, for example, would not have been considered if the betas were more important than prediction alone. Since the purpose here was not to find one or the other, both were considered in order to see how criterion values were affected. 
+\paragraph{}
+Overall, the number of weeks the mother was pregnant seemed to be the most important predictor of baby's weight. When analyzing the AIC, BIC and adjusted $R^2$ values for models containing a single predictor, the model based on $weeks$ is the most appropriate. Building the model up to be stronger according to the selection criterion only complicated the model and made it less approachable. If an author's goal is have a model that is easy to interpret and use, tinkering with the model make not be in the author's best interest.
 
 
 
@@ -340,5 +561,5 @@ mean(weight,na.rm=TRUE) + qnorm(.975)*(sd(weight,na.rm=TRUE)/sqrt(1000))
 
 @
 
-
+\end{raggedright}
 \end{document}
