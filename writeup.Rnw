@@ -16,6 +16,7 @@
 
 
 \begin{document}
+\begin{raggedright}
 \maketitle
 
 \tableofcontents
