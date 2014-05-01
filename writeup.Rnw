@@ -78,14 +78,14 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
 }
 @
 
-\section{Data Description: NCbirths}
-This dataset was acquired from OpenIntro.org's free collection. According to the metadata, `ncbirths' was released in 2004 by North Carolina. This data set has been of interest to medical researchers who are studying the relation between habits and practices of expectant mothers and the birth of their children. The data provided by OpenIntro is a random sample of 1,000 cases from this data set.
+\section{Introduction}
+\paragraph{} This dataset was acquired from OpenIntro.org's free collection. According to the metadata, `ncbirths' was released in 2004 by North Carolina. This data set has been of interest to medical researchers who are studying the relation between habits and practices of expectant mothers and the birth of their children. The data provided by OpenIntro is a random sample of 1,000 cases from this data set.
 
-Of the 13 variables presented in the dataset, there are several options for thinking about predictors vs. response variables. Some of these are clearly predictors: fage, mage, marital, habit, gender, whitemom. Others could be considered either predictors or responses: weeks, premie, visits, gained, weight (or lowbirthweight). Based on the dataset description, which states that the research was exploring "habits and practices of expectant mothers," our inference is that habits and practices refer to weight gained by the mother and the smoking status of the mother (possibly marital status as well). The most likely responses are hospital visits, weeks (related to premie), and weight (related to lowbirthweight). An additional key characteristic of this dataset is that 6 of the variables are pairs of continuous and categorical data (see Table \ref{table:factors}).
+\paragraph{} Of the 13 variables presented in the dataset, there are several options for thinking about predictors vs. response variables. Some of these are clearly predictors: \verb|fage|, \verb|mage|, \verb|marital|, \verb|habit|, \verb|gender|, \verb|whitemom|. Others could be considered either predictors or responses: \verb|weeks|, \verb|premie|, \verb|visits|, \verb|gained|, \verb|weight| (or \verb|lowbirthweight|). Based on the dataset description, which states that the research was exploring "habits and practices of expectant mothers," our inference is that habits and practices refer to weight gained by the mother and the smoking status of the mother (possibly marital status as well). The most likely responses are (hospital) \verb|visits|, (gestational) \verb|weeks| (related to \verb|premie|), and (baby's birth) \verb|weight| (related to \verb|lowbirthweight|). An additional key characteristic of this dataset is that 6 of the variables are pairs of continuous and categorical data (see Table \ref{table:factors}).
 
-One of the main challenges from this dataset is that we do not have data synced to a gestational age other than at term. The values for visits, weeks, weight, and gained are all collected at birth. While it makes sense to include all variables in any exploratory analysis of relationships among these variables, the value of any of these as prediction terms is problematic because they are collected at the end of the pregancy.
+\paragraph{}One of the main challenges from this dataset is that we do not have data synced to a gestational age other than at term. The values for \verb|visits|, \verb|weeks|, \verb|weight|, and \verb|gained| are all collected at birth. While it makes sense to include all variables in any exploratory analysis of relationships among these variables, the value of any of these as prediction terms is problematic because they are collected at the end of the pregancy.
 
-We are most interested in the baby's weight at birth, which we will examine in both its continuous and factored format. This is our initial, full model:
+\paragraph{}We are most interested in the baby's weight at birth, which we will examine in both its continuous and factored format. This is our initial, full model:
 <<eval=FALSE>>=
 lm(weight ~ mage + fage + weeks + visits + gained + habit + whitemom + marital + gender)
 glm(lowbirthweight ~ mage + fage + weeks + visits + gained + habit + whitemom + marital + gender, family=binomial)
@@ -141,6 +141,9 @@ weight & birth weight of baby & 1 & 7.31 & 7.101 & 11.750 & 0 & (7.007482,7.1945
 
 \end{landscape}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%% Sara's Analysis %%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Model Selection Analysis: Sara Nu\~nez}
 \subsection{Methods}
 \paragraph{}
@@ -365,55 +368,7 @@ Overall, the number of weeks the mother was pregnant seemed to be the most impor
 
 
 
-\section*{Original Plots from Rough Draft}
-Keeping these in the doc for now in case we want to use any of them in the final.
 
-
-
-<<echo=FALSE>>=
-p1 <- qplot(mage, binwidth=1, xlab="Mother's Age in Years", main="Distribution of Mother's Age")
-p2 <- qplot(fage, binwidth=1, xlab="Father's Age in Years", main="Distribution of Father's Age")
-p3 <- qplot(weeks, binwidth=1, xlab="Length of Pregnancy in Weeks", main="Distribution of Pregnancy in Weeks")
-p4 <- qplot(visits, binwidth=1, xlab="Visits during Pregnancy", main="Distribution of Visits")
-p5 <- qplot(weight, binwidth=.5, xlab="Weight of Baby (lbs)", main="Distribution of Weight of Baby")
-p6 <- qplot(gained, binwidth=5, xlab="Weight Gained by Mother", main="Distribution of Weight Gain")
-multiplot(p1,p2,p3,p4,p5,p6,cols=2)
-@
-
-
-
-<<echo=FALSE>>=
-
-plot1<-ggplot(births,aes(x= weeks, y = weight))+geom_point(aes(colour=habit))+ggtitle("Scatterplot of Weeks versus Weight of Baby, Factored by Mother's Smoking Habits")
-
-plot2<-ggplot(births,aes(x= weight, y = gained))+geom_point(aes(colour=lowbirthweight))+ggtitle("Scatterplot of Weigth of Baby versus Weight Gained by Mother, Factored by Low or Not Low Birth Weight")
-
-plot1
-
-@
-
-
-<<echo=FALSE>>=
-plot2<-ggplot(births,aes(x= weight, y = gained))+geom_point(aes(colour=lowbirthweight))+ggtitle("Scatterplot of Weigth of Baby versus Weight Gained by Mother, Factored by Low or Not Low Birth Weight")
-plot2
-@
-
-<<echo=FALSE>>=
-box1<-qplot(factor(gender), weight, data = births, geom = "boxplot", xlab="Gender", ylab="Weight of Baby") 
-box2<-qplot(factor(whitemom), weight, data = births, geom = "boxplot", xlab="Ethnicity of Mother", ylab="Weight of Baby")
-box3<-qplot(factor(premie), weight, data = births, geom = "boxplot", xlab="Term of Pregnancy", ylab="Weight of Baby") 
-box4<-qplot(factor(mature), weight, data = births, geom = "boxplot", ylab="Weight of Baby") 
-
-
-@
-\newpage
-\subsection*{Boxplot Figures}
-
-<<echo=FALSE>>=
-multiplot(box1,box2,box3,box4,cols=2)
-@
-
-\subsection*{Summary stats for megatable}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Summary stats needed for table of variables %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
