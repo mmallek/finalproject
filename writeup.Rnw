@@ -1,12 +1,16 @@
-\documentclass[12pt]{article}
-\usepackage{geometry}                
-\geometry{letterpaper, top=1.5cm, left=2cm}     
+\documentclass[11pt]{article}
+%\usepackage{geometry}                
+%\geometry{letterpaper, top=1.5cm, left=2cm} 
+\usepackage[left=1in,right=1in,top=1in,bottom=1in]{geometry}
 \usepackage{url}
 \usepackage{amsmath}
 \usepackage{enumerate}
+\usepackage{fancyhdr}
 \usepackage{ textcomp }
 \usepackage{lscape}
 \usepackage{multirow}
+
+
 
 \renewcommand{\familydefault}{cmss}
 
@@ -16,7 +20,6 @@
 
 
 \begin{document}
-\begin{raggedright}
 \maketitle
 
 \tableofcontents
@@ -29,6 +32,11 @@ require(GGally)
 require(RCurl)
 require(knitr)
 theme_set(theme_bw())
+# required for Maritza
+require(rpart)
+require(tree)
+require(rattle)
+require(rpart.plot)
 @
 % Load data
 <<echo=FALSE>>=
@@ -79,13 +87,13 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
 @
 
 \section{Introduction}
-\paragraph{} This dataset was acquired from OpenIntro.org's free collection. According to the metadata, `ncbirths' was released in 2004 by North Carolina. This data set has been of interest to medical researchers who are studying the relation between habits and practices of expectant mothers and the birth of their children. The data provided by OpenIntro is a random sample of 1,000 cases from this data set.
+This dataset was acquired from OpenIntro.org's free collection. According to the metadata, `ncbirths' was released in 2004 by North Carolina. This data set has been of interest to medical researchers who are studying the relation between habits and practices of expectant mothers and the birth of their children. The data provided by OpenIntro is a random sample of 1,000 cases from this data set.
 
-\paragraph{} Of the 13 variables presented in the dataset, there are several options for thinking about predictors vs. response variables. Some of these are clearly predictors: \verb|fage|, \verb|mage|, \verb|marital|, \verb|habit|, \verb|gender|, \verb|whitemom|. Others could be considered either predictors or responses: \verb|weeks|, \verb|premie|, \verb|visits|, \verb|gained|, \verb|weight| (or \verb|lowbirthweight|). Based on the dataset description, which states that the research was exploring "habits and practices of expectant mothers," our inference is that habits and practices refer to weight gained by the mother and the smoking status of the mother (possibly marital status as well). The most likely responses are (hospital) \verb|visits|, (gestational) \verb|weeks| (related to \verb|premie|), and (baby's birth) \verb|weight| (related to \verb|lowbirthweight|). An additional key characteristic of this dataset is that 6 of the variables are pairs of continuous and categorical data (see Table \ref{table:factors}).
+Of the 13 variables presented in the dataset, there are several options for thinking about predictors vs. response variables. Some of these are clearly predictors: \verb|fage|, \verb|mage|, \verb|marital|, \verb|habit|, \verb|gender|, \verb|whitemom|. Others could be considered either predictors or responses: \verb|weeks|, \verb|premie|, \verb|visits|, \verb|gained|, \verb|weight| (or \verb|lowbirthweight|). Based on the dataset description, which states that the research was exploring "habits and practices of expectant mothers," our inference is that habits and practices refer to weight gained by the mother and the smoking status of the mother (possibly marital status as well). The most likely responses are (hospital) \verb|visits|, (gestational) \verb|weeks| (related to \verb|premie|), and (baby's birth) \verb|weight| (related to \verb|lowbirthweight|). An additional key characteristic of this dataset is that 6 of the variables are pairs of continuous and categorical data (see Table \ref{table:factors}).
 
-\paragraph{}One of the main challenges from this dataset is that we do not have data synced to a gestational age other than at term. The values for \verb|visits|, \verb|weeks|, \verb|weight|, and \verb|gained| are all collected at birth. While it makes sense to include all variables in any exploratory analysis of relationships among these variables, the value of any of these as prediction terms is problematic because they are collected at the end of the pregancy.
+One of the main challenges from this dataset is that we do not have data synced to a gestational age other than at term. The values for \verb|visits|, \verb|weeks|, \verb|weight|, and \verb|gained| are all collected at birth. While it makes sense to include all variables in any exploratory analysis of relationships among these variables, the value of any of these as prediction terms is problematic because they are collected at the end of the pregancy.
 
-\paragraph{}We are most interested in the baby's weight at birth, which we will examine in both its continuous and factored format. This is our initial, full model:
+We are most interested in the baby's weight at birth, which we will examine in both its continuous and factored format. This is our initial, full model:
 <<eval=FALSE>>=
 lm(weight ~ mage + fage + weeks + visits + gained + habit + whitemom + marital + gender)
 glm(lowbirthweight ~ mage + fage + weeks + visits + gained + habit + whitemom + marital + gender, family=binomial)
@@ -258,15 +266,14 @@ plot(m1012)
 \subsection{Results}
 \paragraph{}
 There were 1023 possible models to consider that were generated through the algorithm. After running through the code and looking at the three model criterion described above, there were two models of interest. Model 1012 had the smallest AIC and smallest BIC, while model 833 had the largest adjusted $R^2$. 
-\paragraph{}
+
 Because AIC and BIC values were in agreement that model 1012 was the best, and the adjusted $R^2$ values were similar for the two models, model 1012 was considered the best model using this method of selection. 
-\newline
-\newline
+
 The following is a summary of the chosen model:
 <<echo=FALSE>>=
 out[[1012]]
 @
-\paragraph{}
+
 Possible transformations were then explored for variables $\emph{weeks}$ and $\emph{visits}$, as both seem to have nonlinear relationships in the model. The transformed model was tested for curvature using the Tukey test ($p > .05$), and includes $premie$, $marital$, $gained$, $gender$, $habit$ and $whitemom$ as untransformed variables, and $weeks$ and $visits$ transformed. The transformed model also reduced AIC and BIC values and increased the adjusted $R^2$ coefficient (as compared to the original model).
 <<echo=FALSE>>=
 weeks2 <- (births[,"weeks"])^(1/8)
@@ -286,7 +293,7 @@ summary(m1012)$adj.r.squared
 
 plot(t1012)
 @
-\paragraph{}
+
 Possible interactions between pairs of variables in this model were also considered. The interaction between $premie$ and $weeks$ was considered the strongest of all the possible pairs and enhanced the model criterion further. That is, AIC and BIC values were reduced by adding this interaction, and adjusted $R^2$ was increased. The following table summarizes the criterion for the original models considered and the final model reached through transformations of $weeks$ and $visits$ and adding the interaction between $weeks$ and $premie$ to model 1012.
 % final model summary
 <<echo=FALSE>>=
@@ -349,25 +356,155 @@ Final Model&\bf{2795.747}&\bf{2859.045}&\bf{0.513}\\
 \end{tabular}
 \end{center}
 \subsection{Conclusions and Limitations}
-\paragraph{}
+
 Model selection is subjective and far from straightforward. Depending on what criterion one chooses to use, what the ultimate study goal is, and how exhaustive the model building process is, different models will be reached as appropriate. There is no one "best" model and often times criterion will disagree which models are more appropriate. The three plots below display fitted values against residuals for three separate models reached in this analysis. Differences are subtle and none are perfect.
-<<echo=FALSE,fig.height=2.5>>=
+<<echo=FALSE,fig.height=2.5, fig.align='center'>>=
 par(mfrow = c(1, 3))
 plot(t1012,which=1,caption="Transformed Model 1012")
 plot(t833,which=1,caption="Transformed Model 833")
 plot(tI1012,which=1,caption="Final Model")
 @
 
-\paragraph{}
 There were multiple limitations of model selection found in this analysis. Transformations and interactions were considered after the model was selected. Intuitively, however, this should be done first. There is no guarantee that the model selected would have still been the most appropriate in comparison to the others had transformations and interactions been considered prior to iterating through all possible models. Another limitation found is that the predictor $visits$ is considered insignificant in the original model displayed above. Removing this variable, however, would give a different model (already considered in the algorithm) with significantly larger AIC and BIC values. Furthermore, in terms of the data, a linear model may not have been the best choice, as it appears constant variance may be violated in the final model reached in this analysis.
-\paragraph{}
+
 While this analysis did not reach a conclusive model to predict baby's weight or to have interpretable betas, it did explore the complexities of the exhaustive model selection process. Decisions on which model to build from are subjective and different criterion are used by different authors. In addition, models are built with the goal of the study in mind. By the end of this analysis, the model became less about the interpretation of the betas and more about trying to find a model that would best predict the response variable. Transformations, for example, would not have been considered if the betas were more important than prediction alone. Since the purpose here was not to find one or the other, both were considered in order to see how criterion values were affected. 
-\paragraph{}
+
 Overall, the number of weeks the mother was pregnant seemed to be the most important predictor of baby's weight. When analyzing the AIC, BIC and adjusted $R^2$ values for models containing a single predictor, the model based on $weeks$ is the most appropriate. Building the model up to be stronger according to the selection criterion only complicated the model and made it less approachable. If an author's goal is have a model that is easy to interpret and use, tinkering with the model make not be in the author's best interest.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%% Jon's Analysis %%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%% Maritza's Analysis %%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\section{Classification and Regression Trees (CART): Maritza Mallek}
+\subsection{Introduction} Classification and Regression Trees (CARTs) are a nonparametric approach to regression. CARTs are generated through binary recursive partitioning, in which each potential independent variable used to build the model is tested to obtain the value at which the most meaningful split between two branches can be created. The rules can vary within and among R packages, but the goal is usually to minimize a value such as the sum of squared residuals, Gini index, or misclassification rate. The recursive aspect occurs as this process is repeated at each node of the tree, creating two new branches off each node until some predefined set of constraints are met, which stops the model. These constraints may include the number of observations in a node or marginal improvement in the value to be minimized.
+
+Trees are popular because they are fairly intuitive to interpret, especially for non-statisticians, including in public health settings. At each node an equality is shown; for a given observation, if the inequality resolves as \textsc{true}, the reader follows the left branch. The alternative to CARTs is typically some form of parametric regression, such as GLM. For a doctor in a hospital, consulting a regression tree is much simpler than generating and interpreting a regression model. Because CARTs are nonparametric, the results do not explain why certain variable values result in the observed response, but in situations where researchers are interested in the likelihood and not necessarily interested in how to change an outcome, CARTs are a reasonable tool. They may be used for either exploratory or predictive data analysis.
+
+\subsection{Methods: CART using R} Analysts running CART analysis in R typically use either the \verb|tree| or the \verb|rpart| package. The \verb|tree| package uses residuals, similarly to GLMs, while \verb|rpart| grows the tree using the Gini index of the data. In this analysis, the tree package was the primary tool. Also included are results using \verb|rpart| because better data visualization tools are available for this package, even if it is not as directly interpretable as the output from \verb|tree|.
+
+The response variable selected for analysis by the group was \verb|weight|, also present in the dataset as the factored variable \verb|lowbirthweight|. The former is appropriate for regression tree analysis, while the latter is appropriate for classification trees. In this paper the biological significance of a 5.5 lb cutoff for low birth rate is accepted, and therefore \verb|lowbirthweight| is used. Because the dataset includes no missing values for the response variable, the original and complete dataset is used. Where missing values occur in the predictor values, they are passed over (not factored in). Standard practice in CART analysis is to first grow a tree, then ``prune" it by removing lower branches to avoid overfitting the data. Cross-validation is used to determine how much to prune a tree. The standard is 10-fold, and was employed here. In the first step of this analysis, all the available variables (the full model) were used to fit the data using the \verb|tree| package. Default parameters to constrain tree growth were accepted: minimum number of observations per child node = 5, smallest node size = 10, and within-node deviance parameter for nodes to be split = 0.01.
+
+
+<<fullmodel, fig.height=5, fig.width=6, echo=FALSE, eval=FALSE>>=
+form1 = lowbirthweight ~ fage + mage + mature + weeks + visits + marital + gained + gender + habit + whitemom
+bt1 = tree(form1, data = births)
+summary(bt1)
+plot(bt1)
+text(bt1, cex=0.7)
+# Residual mean deviance:  0.3 = 237 / 790
+bt1.cv = cv.tree(bt1)
+bt1.p = prune.tree(bt1, best=3)
+summary(bt1.p)
+plot(bt1.p)
+text(bt1.p, cex=1)
+@
+
+\subsection{Results}
+\subsubsection{Classification tree analysis using the tree package} 
+\paragraph{Investigation of the full model} Results from the initial analysis showed that \verb|weeks| is by far the most important predictor variable available. \verb|Gained|, \verb|marital|, and \verb|visits| were also used to construct the tree, which had 10 nodes, a residual mean deviance of 0.3, and a misclassification error rate of 0.0475. Cross-validation showed the best tree had just 2-3 nodes. Pruning based on this finding (refitting and constraining tree growth) at 3 nodes resulted in a tree in which \verb|weeks| was the only relevant predictor variable. The residual mean deviance and misclassification error rate increased slightly, to 0.363 and 0.0538, respectively.
+
+
+<<prunedtree1, fig.height=3.1, fig.width=6, echo=FALSE, message=FALSE, fig.cap="Classification trees generated with the full model (left) and the alternative model (right). For the full model, 10-fold cross-validation was used to prune the tree, and the final result is pictured here. For the alternative model, pruning techniques reduced the model to 1 node (no tree) and so are not shown.">>=
+form1 = lowbirthweight ~ fage + mage + mature + weeks + visits + marital + gained + gender + habit + whitemom
+bt1 = tree(form1, data = births)
+bt1.cv = cv.tree(bt1)
+bt1.p = prune.tree(bt1, best=3)
+par(mfrow = c(1, 2), mar=c(2,2,2,2))
+plot(bt1.p)
+text(bt1.p, cex=0.8, all=TRUE)
+################
+form2 = lowbirthweight ~ fage + mage  + marital + gender + habit + whitemom
+bt2 = tree(form2, data=births)
+plot(bt2)
+text(bt2, cex=1, all=TRUE, pretty=8)
+#bt3 = rpart(form2, data=births, method="class", control=rpart.control(minbucket=5, cp=0.001, maxcompete=7))
+#fancyRpartPlot(bt3)
+
+@
+
+\paragraph{Investigation of the alternative model} While the finding of \verb|weeks| as the key predictor of low birth weight is reasonable, both logically and by an examination of associated metrics, it is not particularly interesting. A review of the variables used in the model shows that \verb|visits| and \verb|gained|, as well as \verb|weeks|, represent data recorded at the same time as \verb|weight|. Lacking information linked to gestational ages before birth, it may be disingenous to use these in a predictive framework. Given this reasoning, a new model was specified that omitted those variables, specified as:
+\begin{verbatim}
+lowbirthweight ~ fage + mage + marital + gender + habit + whitemom
+\end{verbatim}
+
+<<echo=FALSE, include=FALSE>>=
+form2 = lowbirthweight ~ fage + mage  + marital + gender + habit + whitemom
+bt2 = tree(form2, data=births)
+@
+
+<<echo=FALSE, include=FALSE>>=
+bt2
+summary(bt2)
+plot(bt2)
+text(bt2, cex=1, all=TRUE, pretty=8)
+#plot(cv.tree(bt2))
+@
+
+<<echo=FALSE, include=FALSE, fig.height=4>>=
+bt2.adj = tree(form2, data=births, control=tree.control(1000, mincut=5, minsize=10, mindev=0.005))
+summary(bt2.adj)
+plot(bt2.adj)
+text(bt2.adj, cex=.6, pretty=10)
+
+bt2.adj.cv = cv.tree(bt2.adj)
+bt2.adj.p = prune.tree(bt2.adj, best=which.min(bt2.adj.cv$dev))
+plot(bt2.adj.p)
+text(bt2.adj.p, cex=1, all=TRUE, pretty=10)
+@
+
+Running the classification tree function using the new model produced a tree with just three nodes using the variable \verb|marital|. However, none of the terminal branches included a set of observations that are more than 50\% low birth weight. Thus this model always predicts ``not low'' birth weight. Reducing the stopping criteria allows the tree to grow more branches, and is one way to force a tree to better fit a dataset. In this analysis, the within-node deviance (\verb|mindev|) was halved. As a result, all variables but \verb|gender| were used to produce the tree, which had 18 terminal nodes, a residual mean deviance of 0.5643, and a misclassification error rate of 0.09674. One of the terminal nodes predicted low birth weight for the observations at that node.
+
+\subsubsection{Classification tree analysis using the rpart package} The \verb|rpart| package was briefly explored to further examine the data. The reduced model was used and the default settings regulating tree growth were again adjusted simply to obtain a tree with any branches at all. The minimum number of observations in a terminal node was reduced to 5 and the complexity parameter was reduced to 0.001 (an order of magnitude less than the default). Results differed from those associated with the \verb|tree| package since splits were based on the Gini index. All predictor variables had some importance, although \verb|mage| and \verb|marital| were the most influential. Again, the difficulty of producing trees that isolated low birth weight suggests that the predictor variables used are not necessarily significant, especially for prediction.
+
+
+<<echo=FALSE, include=FALSE, results='hide'>>=
+bt3 = rpart(form2, data=births, method="class", control=rpart.control(minbucket=5, cp=0.001, maxcompete=7))
+printcp(bt3)
+plotcp(bt3)
+print(bt3)
+summary(bt3)
+plot(bt3, uniform=F, main="Classification Tree for Low Birth Weight")
+text(bt3, use.n=TRUE, all=TRUE, pretty=10, cex=0.6)
+fancyRpartPlot(bt3)
+
+cparam = bt3$cptable[which.min(bt3$cptable[,"xerror"]),"CP"]
+
+@
+
+\subsection{Discussion and Conclusions}
+\subsubsection{Classification Trees vs. GLM}
+<<echo=FALSE, include=FALSE, results='hide'>>=
+# compare tree to second-order GLM
+glm1 = glm(form2, data=births, family=binomial)
+summary(glm1)
+# Residual deviance: 457.24  on 791  degrees of freedom
+457.24/791
+@
+The full model was analyzed in R as a generalized linear model (GLM) and logistic regression. Predictor variables hospital \verb|visits| and weight \verb|gained| were significant at the 0.01 level, while smoking and white mom were significant at the 0.1 level. All other variables did not show significance at the 0.1 or smaller level. The classification tree had slightly lower residual deviance than the GLM (0.5014 and 0.5781, respectively). Statistically, the difference between them falls into a subjective zone. While trees are theoretically easy to use, in the case of the selected dataset and response variable, using a tree may generate confusion since it did not make a strong prediction for low birth weight.
+
+Classification trees were of mixed use in exploring this dataset. Four of the predictor variables in the initial model were needed to segment the data. Results showed that none of the recorded variables were particularly well-suited for predicting low birth weight, but any explanations are simple speculation. The pruned, cross-validated tree composed using the full model had only 3 nodes and only one variable was used to create the tree. The trees make clear that \verb|weeks| is a key variable, this seems an obvious result. The second model suggests that further exploration of the associated implications of mother's marital status may lead to variables with some predictive power, which the dataset currently lacks as far as can be detected within the classification tree framework.
+
+\subsubsection{An Interesting Negative Result} This analysis produced an interesting negative result: none of the provided variables are highly significant predictors of low birth weight, especially when discounting variables measured at the same time as birth weight, as in the alternative model. No obvious interactions between variables were revealed through the analysis. To some extent, this is a disappointing outcome because a set of key predictor variables for this attribute was not found. However, the results may be useful because they suggest that additional variables or additional data points over time are needed to understand the relationship between the habits and practices of mothers and health outcomes like low birth weight. 
 
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%% Steele's Analysis %%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%% 1 Page Discussion/Conclusions %%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\section{Group Discussion and Conclusions}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Summary stats needed for table of variables %
@@ -516,5 +653,5 @@ mean(weight,na.rm=TRUE) + qnorm(.975)*(sd(weight,na.rm=TRUE)/sqrt(1000))
 
 @
 
-\end{raggedright}
+
 \end{document}
