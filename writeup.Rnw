@@ -432,9 +432,10 @@ plot(lev,col="blue",main="Leverage")
 #births2[lev>0.04,]
 @
 
+\textbf{Leverage Greater than 0.04}
 \begin{table}[ht]
 \centering
-\begin{tabular}{rrrrrr}
+\begin{tabular}{rrrrrrrr}
 \hline
 Observation & mature & weeks &  marital & gained & weight &habit&whitemom\\
 \hline
@@ -457,9 +458,10 @@ cook<-cooks.distance(results)
 plot(cook,ylab="Cook's Distances")
 #births2[cook>0.02,]
 @
+\textbf{Cook's Distance Greater than 0.02}
 \begin{table}[ht]
 \centering
-\begin{tabular}{rrrrrr}
+\begin{tabular}{rrrrrrrr}
 \hline
 Observation & mature & weeks &  marital & gained & weight &habit&whitemom\\
 \hline
@@ -700,6 +702,16 @@ So, let's walk through the basic characteristics of this plot.  The y-axis displ
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage
 \section{Group Discussion and Conclusions}
+\subsection{Public Health Impact Discussion}
+
+As researchers and collaborators explore relationships between habits and practices of expectant mothers and the birth of their children, it is imperative to maximize the well-being of expectant mothers and their babies. This is especially important, because premature babies have a much higher mortality rate. Developing research has indicated that there are prenatal influences on obesity, which include the mother's smoking habits, mother's weight gain, and the blood sugar levels during pregnancy. It is critical for biostaticians, clinical researchers, Public Health members and Doctors to collaborate on gathering data and teasing out important causes of maladaptive health. With an emphasis on prevention, our regression meta-study hopes to find more predictor variables for baby weight, but also discerning whether or not there is a strong likelihood for a premature birth.
+
+\subsection{Findings}
+
+The dataset in it of itself showed that weeks was the strongest predictor of weight for the babies. The multitude of techniques for model-building collaborated with this notion and it would make intuitive sense that more developed babies in the womb would have a healthier weight than babies born prematurely. In terms of leverage, the dataset did not show any significant observations that would influence the model significantly. 
+
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Summary stats needed for table of variables %
