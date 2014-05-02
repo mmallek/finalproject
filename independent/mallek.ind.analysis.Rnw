@@ -42,17 +42,18 @@ births = getURL("https://raw.githubusercontent.com/mmallek/finalproject/master/n
 births = read.table(text=births, sep='\t', header=TRUE)
 @
 
-%\subsection{Classification and Regression Trees (CART)}
-Classification and Regression Trees (CARTs) are a nonparametric approach to regression. CARTs are generated through binary recursive partitioning, in which each potential independent variable used to build the model is tested to obtain the value at which the most meaningful split between two branches can be created. The rules can vary within and among R packages, but the goal is usually to minimize a value such as the sum of squared residuals, Gini index, or misclassification rate. The recursive aspect occurs as this process is repeated for each branch of the tree until some predefined set of constraints are met, which stops the model. These constraints may include the number of observations in a node or marginal improvement in the value to be minimized. %*At this point, the appropriate regression (logistic, in the case of a classification tree) can be run on the observations contained in each terminal node.*
+\section{Classification and Regression Trees (CART)}
+\subsection{Introduction} Classification and Regression Trees (CARTs) are a nonparametric approach to regression. CARTs are generated through binary recursive partitioning, in which each potential independent variable used to build the model is tested to obtain the value at which the most meaningful split between two branches can be created. The rules can vary within and among R packages, but the goal is usually to minimize a value such as the sum of squared residuals, Gini index, or misclassification rate. The recursive aspect occurs as this process is repeated at each node of the tree, creating two new branches off each node until some predefined set of constraints are met, which stops the model. These constraints may include the number of observations in a node or marginal improvement in the value to be minimized. %*At this point, the appropriate regression (logistic, in the case of a classification tree) can be run on the observations contained in each terminal node.*
+\paragraph{} Trees are popular because they are fairly intuitive to interpret, especially for non-statisticians, including in public health settings. At each node an equality is shown; for a given observation, if the inequality resolves as \textsc{true}, the reader follows the left branch. The alternative to CARTs is typically some form of parametric regression, such as GLM. For a doctor in a hospital, consulting a regression tree is much simpler than generating and interpreting a regression model. Because CARTs are nonparametric, we cannot use the results to explain why certain variable values result in the observed response, but in situations where we are interested in the likelihood and not necessarily interested in how to change an outcome, CARTs are a reasonable tool. They may be used for either exploratory or predictive data analysis.
 
-Trees are popular because they are fairly intuitive to interpret, especially for non-statisticians, including in public health settings. At each node an equality is shown; for a given observation, if the inequality resolves as \textsc{true}, the reader follows the left branch. The alternative to CARTs is typically some form of parametric regression, such as GLM. For a doctor in a hospital, consulting a regression tree is much simpler than generating and interpreting a regression model. Because CARTs are nonparametric, we cannot use the results to explain why certain variable values result in the observed response, but in situations where we are interested in the likelihood and not necessarily interested in how to change an outcome, CARTs are a reasonable tool. They may be used for exploratory or predictive data analysis.
+\subsection{Methods: CART using R} Analysts running CART analysis in R typically use either the \verb|tree| or the \verb|rpart| package. The \verb|tree| package uses residuals, similarly to GLMs, while \verb|rpart| grows the tree using the Gini index of the data. In this analysis, the tree package was the primary tool. Also included are results using \verb|rpart| because better data visualization tools are available for this package, even if it is not as directly interpretable as the output from \verb|tree|.
 
-Analysts running CART analysis in R typically use either the \verb|tree| or the \verb|rpart| package. The tree package uses residuals, similarly to GLMs, while rpart grows the tree using the Gini index of the data. For this analysis, we first used the tree package. We also included results using \verb|rpart| because better data visualization tools are available for this package, even if it isn't as directly interpretable as the output from \verb|tree|.
+\paragraph{} The response variable selected for analysis by the group was \verb|weight|, also present in the dataset as the factored variable \verb|lowbirthweight|. The former is appropriate for regression tree analysis, while the latter is appropriate for classification trees. In this paper the biological significance of a 5.5 lb cutoff for low birth rate is accepted, and therefore \verb|lowbirthweight| is used. 
 
-The response variable selected for analysis by our group is \verb|weight|. We are interested in weight at birth. For a classification tree, the factored variable \verb|lowbirthweight| is appropriate; for a regression tree, we would use \verb|weight|. Here we accept the biological significance of a 5.5 lb cutoff for low birth rate, and therefore use the factored and binary variable \verb|lowbirthweight|. The standard practice for using trees is to first grow the tree, then ``prune" it by removing lower branches to avoid overfitting the data.
+\paragraph{} Because the dataset includes no missing values for the response variable, the original and complete dataset is used. Where missing values occur in the predictor values, they are passed over (not factored in). Standard practice in CART analysis is to first grow a tree, then ``prune" it by removing lower branches to avoid overfitting the data. Cross-validation is used to determine how much to prune a tree. The standard is 10-fold, and was employed here. In the first step of this analysis, all the available variables (the full model) were used to fit the data using the \verb|tree| package. Default parameters to constrain tree growth were accepted: minimum number of observations per child node = 5, smallest node size = 10, and within-node deviance parameter for nodes to be split = 0.01.
 
 
-<<fullmodel, fig.height=6, fig.width=6, echo=FALSE, eval=FALSE>>=
+<<fullmodel, fig.height=5, fig.width=6, echo=FALSE, eval=FALSE>>=
 form1 = lowbirthweight ~ fage + mage + mature + weeks + visits + marital + gained + gender + habit + whitemom
 bt1 = tree(form1, data = births)
 summary(bt1)
@@ -65,24 +66,34 @@ summary(bt1.p)
 plot(bt1.p)
 text(bt1.p, cex=1)
 @
-In this investigation, we first used all the available variables (the full model) to fit the data using the \verb|tree| package. We used the default parameters to constrain tree growth: minimum number of observations per child node = 5, smallest node size = 10, within-node deviance parameter for nodes to be split = 0.01. The results showed that \verb|weeks| is by far the most important predictor. \verb|Gained|, \verb|marital|, and \verb|visits| were also used to construct the tree, which had 10 nodes, a residual mean deviance of 0.3, and a misclassification error rate of 0.0475. We pruned the tree using cross-validation and found that the best tree had just 2-3 nodes. After refitting and constraining tree growth to 3 nodes, we found that \verb|weeks| was the only relevant predictor variable. The residual mean deviance and misclassification error rate increased slightly, to 0.363 and 0.0538, respectively.
 
-%\begin{wrapfigure}{l}{0.5\textwidth}
-<<prunedtree1, fig.height=4, echo=FALSE, fig.cap="Classification tree using the full model to grow the tree. 10-fold cross-validation was used to prune the tree, and the final result is pictured here.">>=
+\subsection{Results}
+\subsubsection{Classification tree analysis using the tree package} 
+\paragraph{Investigation of the full model} Results from the initial analysis showed that \verb|weeks| is by far the most important predictor variable available. \verb|Gained|, \verb|marital|, and \verb|visits| were also used to construct the tree, which had 10 nodes, a residual mean deviance of 0.3, and a misclassification error rate of 0.0475. Cross-validation showed the best tree had just 2-3 nodes. Pruning based on this finding (refitting and constraining tree growth) at 3 nodes resulted in a tree in which \verb|weeks| was the only relevant predictor variable. The residual mean deviance and misclassification error rate increased slightly, to 0.363 and 0.0538, respectively.
+
+
+<<prunedtree1, fig.height=3.1, fig.width=6, echo=FALSE, message=FALSE, fig.cap="Classification trees generated with the full model (left) and the alternative model (right). For the full model, 10-fold cross-validation was used to prune the tree, and the final result is pictured here. For the alternative model, pruning techniques reduced the model to 1 node (no tree) and so are not shown.">>=
 form1 = lowbirthweight ~ fage + mage + mature + weeks + visits + marital + gained + gender + habit + whitemom
 bt1 = tree(form1, data = births)
 bt1.cv = cv.tree(bt1)
 bt1.p = prune.tree(bt1, best=3)
+par(mfrow = c(1, 2), mar=c(2,2,2,2))
 plot(bt1.p)
 text(bt1.p, cex=0.8, all=TRUE)
+################
+form2 = lowbirthweight ~ fage + mage  + marital + gender + habit + whitemom
+bt2 = tree(form2, data=births)
+plot(bt2)
+text(bt2, cex=1, all=TRUE, pretty=8)
+#bt3 = rpart(form2, data=births, method="class", control=rpart.control(minbucket=5, cp=0.001, maxcompete=7))
+#fancyRpartPlot(bt3)
+
 @
-
-While the finding of \verb|weeks| as the key predictor of low birth weight is reasonable, it is not particularly interesting. A review of the variables used in the model shows that \verb|visits| and \verb|gained|, as well as \verb|weeks|, represent data recorded at the same time as \verb|weight|. Since we do not have information linked to gestational ages before birth, it seems disingenous to use these in a predictive framework. Given this reasoning, we proceed with the analysis, omitting these variables from our model specification. The new model is specified as:
-
-<<model2, results='hide'>>=
+\vspace{-3ex}
+\paragraph{Investigation of the alternative model} While the finding of \verb|weeks| as the key predictor of low birth weight is reasonable, both logically and by an examination of associated metrics, it is not particularly interesting. A review of the variables used in the model shows that \verb|visits| and \verb|gained|, as well as \verb|weeks|, represent data recorded at the same time as \verb|weight|. Lacking information linked to gestational ages before birth, it may be disingenous to use these in a predictive framework. Given this reasoning, a new model was specified that omitted those variables, specified as:
+\begin{verbatim}
 lowbirthweight ~ fage + mage + marital + gender + habit + whitemom
-@
-
+\end{verbatim}
 
 <<echo=FALSE, include=FALSE>>=
 form2 = lowbirthweight ~ fage + mage  + marital + gender + habit + whitemom
@@ -106,14 +117,12 @@ text(bt2.adj, cex=.6, pretty=10)
 bt2.adj.cv = cv.tree(bt2.adj)
 bt2.adj.p = prune.tree(bt2.adj, best=which.min(bt2.adj.cv$dev))
 plot(bt2.adj.p)
-text(bt2.adj.p, cex=1, all=TRUE)
+text(bt2.adj.p, cex=1, all=TRUE, pretty=10)
 @
 
-Running the classification tree function on the dataset now produces a tree with just two nodes using the variable \verb|marital|. However, none of the terminal branches includes a set of observations that are more than 50\% low birth weight. One way to address this is to allow the initial tree to grow by reducing the stopping criteria. We chose to reduce the within-node deviance (\verb|mindev|) by half. This resulted in one terminal node leading to a predicted outcome of low birth weight. All variables but \verb|gender| were used to produce the tree, which had 18 terminal nodes, a residual mean deviance of 0.5643, and a misclassification error rate of 0.09674.
+\paragraph{} Running the classification tree function using the new model produced a tree with just three nodes using the variable \verb|marital|. However, none of the terminal branches included a set of observations that are more than 50\% low birth weight. Thus this model always predicts ``not low'' birth weight. Reducing the stopping criteria allows the tree to grow more branches, and is one way to force a tree to better fit a dataset. In this analysis, the within-node deviance (\verb|mindev|) was halved. As a result, all variables but \verb|gender| were used to produce the tree, which had 18 terminal nodes, a residual mean deviance of 0.5643, and a misclassification error rate of 0.09674. One of the terminal nodes predicted low birth weight for the observations at that node.
 
-We thus have an interesting negative result for our data: not only is smoking not a significant predictor of low birth weight, none of the provided variables are. We also fail to find any important interactions between variables. On one hand, this is a disappointing outcome because we have not found a neat and tidy set of predictor variables for this critically important aspect of public health. On the other hand, the results are useful because they suggest that additional variables or additional data points over time are needed to understand the relationship between the habits and practices of mothers and health outcomes like low birth weight.
-
-We also briefly explored the \verb|rpart| package to test our data. Using the reduced model, we again had to adjust the default settings in order to obtain a tree with any branches at all. We set the minimum number of observations in a terminal node to 5 and the complexity parameter to 0.001 (an order of magnitude less than the default). This packages uses a measure of inequality called the Gini index, and our results were that all predictor variables had some importance, although \verb|mage| and \verb|marital| were the most influential. Again, the difficulty with which we produced trees that isolated low birth weight implies that the predictor variables we used are not necessarily significant.
+\subsubsection{Classification tree analysis using the rpart package} The \verb|rpart| package was briefly explored to further examine the data. The reduced model was used and the default settings regulating tree growth were again adjusted simply to obtain a tree with any branches at all. The minimum number of observations in a terminal node was reduced to 5 and the complexity parameter was reduced to 0.001 (an order of magnitude less than the default). Results differed from those associated with the \verb|tree| package since splits were based on the Gini index. All predictor variables had some importance, although \verb|mage| and \verb|marital| were the most influential. Again, the difficulty of producing trees that isolated low birth weight suggests that the predictor variables used are not necessarily significant, especially for prediction.
 
 
 <<echo=FALSE, include=FALSE, results='hide'>>=
@@ -131,24 +140,23 @@ cparam = bt3$cptable[which.min(bt3$cptable[,"xerror"]),"CP"]
 #plot(pbt3, uniform=TRUE, main="Pruned Classification Tree for Low Birth Weight")
 #text(pbt3, use.n=TRUE, all=TRUE, cex=.8)
 
-#fancyRpartPlot(bt3, main="Pruned Classification Tree for Low Birth Weight", extra=101, uniform=FALSE)
+#fancyRpartPlot(pbt3, main="Pruned Classification Tree for Low Birth Weight", uniform=FALSE)
 #fancyRpartPlot(pbt3)
 #prp(bt3, type=1, extra=101, uniform=FALSE)
+
+#bt4 = rpart(form1, data=births, method="class")
+#fancyRpartPlot(bt4)
+#cparam = bt4$cptable[which.min(bt4$cptable[,"xerror"]),"CP"]
+#pbt4 = prune(bt4, cp=cparam)
+#fancyRpartPlot(pbt4)
 @
 
-<<echo=FALSE, fig.height=4, message=FALSE, warning=FALSE, fig.cap='Gini Coefficient-Based Tree Output and Diagram for Pruned Classification Tree'>>=
-fancyRpartPlot(bt3)
-@
+%<<echo=FALSE, fig.height=4, fig.width=4, message=FALSE, warning=FALSE, fig.cap='Gini Coefficient-Based Tree Output %and Diagram for Pruned Classification Tree'>>=
+%fancyRpartPlot(bt3)
+%@
 
-
-%%%%%%%%%% keep?
-
-%try using key variables to build glm
-
-We also compared this tree to the predictive power of a generalized linear model (GLM) using logistic regression. We used the same initial model. Predictor variables hospital visits and weight gained were significant at the 0.01 level, while smoking and white mom were significant at the 0.1 level. All other variables did not show significance at the 0.1 or smaller level. 
-
-The residual deviance of the classification tree is 0.5014, while the residual deviance of the GLM is 0.5781. Therefore the classification tree is better at predicting low birth weight than the logistic regression model. Moreover, due to the ease of use of trees, they may also be more effective in a clinical setting. From a statistical perspective, they are very similar and both are adequate for analysis of this dataset.
-
+\subsection{Discussion and Conclusions}
+\subsubsection{Classification Trees vs. GLM}
 <<echo=FALSE, include=FALSE, results='hide'>>=
 # compare tree to second-order GLM
 glm1 = glm(form2, data=births, family=binomial)
@@ -156,10 +164,16 @@ summary(glm1)
 # Residual deviance: 457.24  on 791  degrees of freedom
 457.24/791
 @
+\paragraph{}The full model was analyzed in R as a generalized linear model (GLM) and logistic regression. Predictor variables hospital \verb|visits| and weight \verb|gained| were significant at the 0.01 level, while smoking and white mom were significant at the 0.1 level. All other variables did not show significance at the 0.1 or smaller level. 
+
+\paragraph{}The residual deviance of the classification tree is 0.5014, while the residual deviance of the GLM is 0.5781. Therefore the classification tree is better at predicting low birth weight than the logistic regression model. However, from a statistical perspective, this benefit may be marginal. Because trees are easy to use, they can be more effective in a clinical setting. In the case of the selected dataset and response variable, a tree may generate confusion since it did not make a strong prediction for low birth weight.
+
+Classification trees were of mixed use in exploring this dataset. Four of the predictor variables in the initial model were needed to segment the data. Results showed that none of the recorded variables were particularly well-suited for predicting low birth weight, but any explanations are simple speculation. The pruned, cross-validated tree composed using the full model had only 3 nodes and only one variable was used to create the tree. The trees make clear that \verb|weeks| is a key variable, this seems an obvious result. The second model suggests that further exploration of the associated implications of mother's marital status may lead to variables with some predictive power, which the dataset currently lacks as far as can be detected within the classification tree framework.
+
+\subsubsection{An Interesting Negative Result} This analysis produced an interesting negative result: none of the provided variables are highly significant predictors of low birth weight, especially when discounting variables measured at the same time as birth weight, as in the alternative model. No obvious interactions between variables were revealed through the analysis. To some extent, this is a disappointing outcome because a set of key predictor variables for this attribute was not found. However, the results may be useful because they suggest that additional variables or additional data points over time are needed to understand the relationship between the habits and practices of mothers and health outcomes like low birth weight. 
 
 
-Discussion
-Classification trees were of mixed use in exploring this dataset. We found that 4 of the predictor variables were most important for segmenting our data. The results showed that none of the recorded variables were particularly well-suited for predicting low birth weight, but any explanations are simple speculation. The pruned, cross-validated tree composed using the full model had only 3 nodes and only one variable was used to create the tree. While we can therefore conclude that \verb|weeks| is a key variable, it is not a very interesting result.
+
 
 References
 http://www.stat.cmu.edu/~cshalizi/350/lectures/22/lecture-22.pdf
