@@ -32,6 +32,8 @@ require(GGally)
 require(RCurl)
 require(knitr)
 theme_set(theme_bw())
+#required for Jonathan
+require(leaps)
 # required for Maritza
 require(rpart)
 require(tree)
@@ -375,7 +377,73 @@ Overall, the number of weeks the mother was pregnant seemed to be the most impor
 %%%%%%%%%%%%%%%%%%%%% Jon's Analysis %%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage
+\section{Model Selection and Diagnostics: Jonathan Chiang}
+\subsection{Introduction}
+The all possible regressions approach actually looks at all possible combinations or subsets of each and all predictor variables and can fit the data according to a pre-selected criteria. Such criteria, proposed earlier, AIC and BIC each have a subsequent score, which allows us to rank our models accordingly. 
+\subsection{Figures and Tables}
+<<echo=FALSE, message=FALSE,fig=TRUE>>=
 
+births2 = births
+births2$lowbirthweight<-NULL
+births2$premie<-NULL
+Selection<-regsubsets(weight~fage+mage+weeks+gender+habit+whitemom, data=births2,nbest=4) 
+@
+
+\subsubsection*{Residuals and Leverage of NC Births Data}
+
+Model Diagnostics. After fitting regession models we need to determine whether our model assumptions can be used before actually making an inference. We should look for violations and look for the consequential inferential procedures that would be void for these incorrect conclusions.
+
+
+Model Diagnostics combines both graphical and statistical methods. 
+
+Using our formal model:
+<<echo=FALSE, message=FALSE>>=
+results<-(lm(weight ~ weeks+ + marital + gained + gender + habit + whitemom,births2))
+@
+
+Leverage = ability to move a regression model by itself by moving in the y direction.  Shifted in the y direction. Leverage is always between one and zero. Zero implies that there is no effect on the model whereas one means the lines follow the point perfectly.
+
+<<echo=FALSE, message=FALSE,fig.height=4,fig.width=4>>=
+lev<-hat(model.matrix(results))
+plot(lev,col="blue",main="leverage")
+births2[lev>0.04,]
+@
+After reviewing the leverage plot I wanted to check for outliers that maybe of interest. Observations 18, 287 and 969 seemed to be the most important for leverage.
+
+Point 969 has the highest leverage. 
+
+
+
+<<echo=FALSE, message=FALSE,fig.height=4,fig.width=4>>=
+#results.residuals<-resid(results)
+#plot(results.residuals)
+
+#r<-rstudent(results)
+#plot(r)
+
+cook<-cooks.distance(results)
+plot(cook,ylab="Cook's Distances")
+births2[cook>0.02,]
+@
+
+\begin{center}
+\begin{tabular}{|r|r|r|r|}
+\hline
+Model&AIC&BIC&Adjusted $R^2$\\
+\hline
+Original 1012&2864.074&2912.767&0.475\\
+Original 833&2972.751&3011.981&0.493\\
+Final Model&\bf{2795.747}&\bf{2859.045}&\bf{0.513}\\
+\hline
+\end{tabular}
+\end{center}
+
+
+\subsection{Methods}
+"Lowbirthweight" and the "premie" were not included in the model, because they are variables predicated on weeks and weight in categorical form. 
+\subsection{Discussion}
+\subsection{Conclusion}
+\
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%% Maritza's Analysis %%%%%%%%%%%%%%%%%%%%%%%
