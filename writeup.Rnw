@@ -392,7 +392,7 @@ All three model approaches concluded through AIC and BIC that weeks, gender, mar
 \subsection{Residuals and Leverage}
 
 Model Diagnostics. After fitting regession models we need to determine whether our model assumptions can be used before actually making an inference. We should look for violations and look for the consequential inferential procedures that would be void for these incorrect conclusions. Model Diagnostics combines both graphical and statistical methods. 
-<<echo=FALSE, message=FALSE,fig=TRUE>>=
+<<echo=FALSE, message=FALSE>>=
 
 births2 = births
 births2$lowbirthweight<-NULL
@@ -469,7 +469,7 @@ Observation & mature & weeks &  marital & gained & weight &habit&whitemom\\
 
 \subsection{Discussion and Conclusion}
 
-The dataset presented did not show any significant points of leverage. After plotting points in pair-wise variable scatter plots there were few outliers in the data. When conducting an all-possible regressions approach and/or step-wise regression it is imperative to use these models as guidelines and conduct more thorough thought into developing these models. Interactions must be accounted for and the P-values and R$\^2$ values may not be reliable in these cases. The models used, however, aligned very well with other approaches that analyzed the data. \newline Upon looking at the leverage, the outliered points were not very influential, which made using cook's distance less statistcally useful when intepreting the influence of the outliered observations.   
+The dataset presented did not show any significant points of leverage. After plotting points in pair-wise variable scatter plots there were few outliers in the data. When conducting an all-possible regressions approach and/or step-wise regression it is imperative to use these models as guidelines and conduct more thorough thought into developing these models. Interactions must be accounted for and the P-values and $R^2$ values may not be reliable in these cases. The models used, however, aligned very well with other approaches that analyzed the data. \newline Upon looking at the leverage, the outliered points were not very influential, which made using cook's distance less statistcally useful when intepreting the influence of the outliered observations.   
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%% Maritza's Analysis %%%%%%%%%%%%%%%%%%%%%%%
