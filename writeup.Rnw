@@ -639,7 +639,7 @@ As aforementioned, this is a tricky plot, but the techniques utilized are simple
 
 \subsection{Analyzing Missing Data}
 For the analysis of missing data, we need two items, the group's original model and the imputed model.  Let us run the original model our group has chosen below.
-<<echo=TRUE >>=
+<<echo=TRUE, results='hide'>>=
 group.model <- lm(weight~fage+mage+weeks+visits+marital+gained+gender+habit+whitemom, data=ncbirths)
 summary(group.model)
 @
