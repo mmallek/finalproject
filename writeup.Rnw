@@ -432,6 +432,7 @@ plot(lev,col="blue",main="Leverage")
 #births2[lev>0.04,]
 @
 
+\textbf{Leverage Greater than 0.04}
 \begin{table}[ht]
 \centering
 \begin{tabular}{rrrrrrrr}
@@ -457,6 +458,7 @@ cook<-cooks.distance(results)
 plot(cook,ylab="Cook's Distances")
 #births2[cook>0.02,]
 @
+\textbf{Cook's Distance Greater than 0.02}
 \begin{table}[ht]
 \centering
 \begin{tabular}{rrrrrrrr}
