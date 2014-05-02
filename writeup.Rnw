@@ -9,8 +9,7 @@
 \usepackage{ textcomp }
 \usepackage{lscape}
 \usepackage{multirow}
-
-
+\setcounter{tocdepth}{2}
 
 \renewcommand{\familydefault}{cmss}
 
