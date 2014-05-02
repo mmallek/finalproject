@@ -382,26 +382,27 @@ Overall, the number of weeks the mother was pregnant seemed to be the most impor
 %%%%%%%%%%%%%%%%%%%%% Jon's Analysis %%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage
-\section{Model Selection and Diagnostics: Jonathan Chiang}
+\section{Variable Selection and Model Diagnostics: Jon Chiang}
+
 \subsection{Introduction}
-The all possible regressions approach actually looks at all possible combinations or subsets of each and all predictor variables and can fit the data according to a pre-selected criteria. Such criteria, proposed earlier, AIC and BIC each have a subsequent score, which allows us to rank our models accordingly. 
-\subsection{Figures and Tables}
+The all possible regressions approach actually looks at all possible combinations or subsets of each and all predictor variables and can fit the data according to a pre-selected criteria. Such criteria, proposed earlier, AIC and BIC each have a subsequent score, which allows us to rank our models accordingly. This analysis incorporated a step-wise regression in the forwards and backwards regression and an all possible regressions apporahc which uses all possible subsets of the pool of explanatory variables in order to fit a model.
+
+All three model approaches concluded through AIC and BIC that weeks, gender, marital, gained and whitemom variables were suitable predictor variables. There was some discrepancy of female age, but the model did not show significant improvement. 
+
+
+\subsection{Methods}
+"Lowbirthweight" and the "premie" were not included in the model, because they are variables predicated on weeks and weight in categorical form. The leaps package in R was used to build the all-possible regression model. Pair-wise plots were used to study the variables and look for possible associations. Also, I used R to find leverage to find influential observations that may have skewed the data and subsequently plotted the residuals and cook's distance. 
+
+\subsection{Residuals and Leverage}
+
+Model Diagnostics. After fitting regession models we need to determine whether our model assumptions can be used before actually making an inference. We should look for violations and look for the consequential inferential procedures that would be void for these incorrect conclusions. Model Diagnostics combines both graphical and statistical methods. 
 <<echo=FALSE, message=FALSE,fig=TRUE>>=
 
 births2 = births
 births2$lowbirthweight<-NULL
 births2$premie<-NULL
-Selection<-regsubsets(weight~fage+mage+weeks+gender+habit+whitemom, data=births2,nbest=4) 
+Selection<-regsubsets(weight~fage+mage+weeks+gender+habit+whitemom+marital, data=births2,nbest=4) 
 @
-
-\subsubsection*{Residuals and Leverage of NC Births Data}
-
-Model Diagnostics. After fitting regession models we need to determine whether our model assumptions can be used before actually making an inference. We should look for violations and look for the consequential inferential procedures that would be void for these incorrect conclusions.
-
-
-Model Diagnostics combines both graphical and statistical methods. 
-
-Using our formal model:
 <<echo=FALSE, message=FALSE>>=
 results<-(lm(weight ~ weeks+ + marital + gained + gender + habit + whitemom,births2))
 results.table<-xtable(results)
@@ -423,18 +424,27 @@ whitemomwhite & 0.2121 & 0.0813 & 2.61 & 0.0092 \\
 \hline
 \end{tabular}
 \end{table}
-Leverage = ability to move a regression model by itself by moving in the y direction.  Shifted in the y direction. Leverage is always between one and zero. Zero implies that there is no effect on the model whereas one means the lines follow the point perfectly.
+
 
 <<echo=FALSE, message=FALSE,fig.height=3.5,fig.width=6>>=
 lev<-hat(model.matrix(results))
-plot(lev,col="blue",main="leverage")
-births2[lev>0.04,]
+plot(lev,col="blue",main="Leverage")
+#births2[lev>0.04,]
 @
-After reviewing the leverage plot I wanted to check for outliers that maybe of interest. Observations 18, 287 and 969 seemed to be the most important for leverage.
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{rrrrrr}
+\hline
+Observation & mature & weeks &  marital & gained & weight &habit&whitemom\\
+\hline
+942 & mature mom & 40 & married  & 35 & 8.63 & nonsmoker &white\\
 
 
-
-
+\hline
+\end{tabular}
+\end{table}
+ 
 
 <<echo=FALSE, message=FALSE,fig.height=3.5,fig.width=6>>=
 #results.residuals<-resid(results)
@@ -445,17 +455,25 @@ After reviewing the leverage plot I wanted to check for outliers that maybe of i
 
 cook<-cooks.distance(results)
 plot(cook,ylab="Cook's Distances")
-births2[cook>0.02,]
-
+#births2[cook>0.02,]
 @
+\begin{table}[ht]
+\centering
+\begin{tabular}{rrrrrr}
+\hline
+Observation & mature & weeks &  marital & gained & weight &habit&whitemom\\
+\hline
+70 & younger mom & 37 & married  & 25 & 6.19 &smoker&not white\\
+665 & younger mom & 39 & not married & 21 & 7.88 &nonsmoker& white\\
+
+\hline
+\end{tabular}
+\end{table}
 
 
+\subsection{Discussion and Conclusion}
 
-\subsection{Methods}
-"Lowbirthweight" and the "premie" were not included in the model, because they are variables predicated on weeks and weight in categorical form. 
-\subsection{Discussion}
-\subsection{Conclusion}
-\
+The dataset presented did not show any significant points of leverage. After plotting points in pair-wise variable scatter plots there were few outliers in the data. When conducting an all-possible regressions approach and/or step-wise regression it is imperative to use these models as guidelines and conduct more thorough thought into developing these models. Interactions must be accounted for and the P-values and R$\^2$ values may not be reliable in these cases. The models used, however, aligned very well with other approaches that analyzed the data. \newline Upon looking at the leverage, the outliered points were not very influential, which made using cook's distance less statistcally useful when intepreting the influence of the outliered observations.   
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%% Maritza's Analysis %%%%%%%%%%%%%%%%%%%%%%%
