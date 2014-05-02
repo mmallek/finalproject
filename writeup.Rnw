@@ -40,6 +40,7 @@ require(rpart)
 require(tree)
 require(rattle)
 require(rpart.plot)
+# required for Steele
 require(Hmisc)
 require(Amelia)
 require(Zelig)
@@ -98,13 +99,16 @@ This dataset was acquired from OpenIntro.org's free collection. According to the
 
 Of the 13 variables presented in the dataset, there are several options for thinking about predictors vs. response variables. Some of these are clearly predictors: \verb|fage|, \verb|mage|, \verb|marital|, \verb|habit|, \verb|gender|, \verb|whitemom|. Others could be considered either predictors or responses: \verb|weeks|, \verb|premie|, \verb|visits|, \verb|gained|, \verb|weight| (or \verb|lowbirthweight|). Based on the dataset description, which states that the research was exploring "habits and practices of expectant mothers," our inference is that habits and practices refer to weight gained by the mother and the smoking status of the mother (possibly marital status as well). The most likely responses are (hospital) \verb|visits|, (gestational) \verb|weeks| (related to \verb|premie|), and (baby's birth) \verb|weight| (related to \verb|lowbirthweight|). An additional key characteristic of this dataset is that 6 of the variables are pairs of continuous and categorical data (see Table \ref{table:factors}).
 
-One of the main challenges from this dataset is that we do not have data synced to a gestational age other than at term. The values for \verb|visits|, \verb|weeks|, \verb|weight|, and \verb|gained| are all collected at birth. While it makes sense to include all variables in any exploratory analysis of relationships among these variables, the value of any of these as prediction terms is problematic because they are collected at the end of the pregancy.
 
-We are most interested in the baby's weight at birth, which we will examine in both its continuous and factored format. This is our initial, full model:
+
+We are most interested in the baby's weight at birth, which we will examine in both its continuous and factored format. We chose not to construct a specific hypothesis based on this data to allow for freedom and flexibility within the individual projects. We assumed that all variables collected were potentially important or significant as predictors, so they were all included at the initial phase of each individual analysis. The initial, full model (shown for both the continuous and categorical version of the variable-of-interest) is shown here:
+
 <<eval=FALSE>>=
 lm(weight ~ mage + fage + weeks + visits + gained + habit + whitemom + marital + gender)
 glm(lowbirthweight ~ mage + fage + weeks + visits + gained + habit + whitemom + marital + gender, family=binomial)
 @
+
+Our individual analyses explore the relationships between variables and seek to define the relative importance of some variables, and eventually a best model. The first analysis presented here involved writing a function to rank and identify the best model for the observed data using AIC, BIC, and $R^2$. A second exploration of variable selection and model diagnostics complemented the first project and added an investigation into leverage using Cook's distance. The third project focused on the potential utility of classification trees to help understand relative variable importance and provide a more intuitive, visual model of the data. Finally, the last project sought to develop methods for addressing missing values in the dataset and examine how the presence of missing values may affect results.
 
 \begin{landscape}
 
@@ -710,7 +714,7 @@ As researchers and collaborators explore relationships between habits and practi
 
 The dataset in it of itself showed that weeks was the strongest predictor of weight for the babies. The multitude of techniques for model-building collaborated with this notion and it would make intuitive sense that more developed babies in the womb would have a healthier weight than babies born prematurely. In terms of leverage, the dataset did not show any significant observations that would influence the model significantly. 
 
-
+One of the main challenges from this dataset is that we do not have data synced to a gestational age other than at term. The values for \verb|visits|, \verb|weeks|, \verb|weight|, and \verb|gained| are all collected at birth. While it makes sense to include all variables in any exploratory analysis of relationships among these variables, the value of any of these as prediction terms is problematic because they are collected at the end of the pregancy.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
