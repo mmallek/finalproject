@@ -34,6 +34,7 @@ require(knitr)
 theme_set(theme_bw())
 #required for Jonathan
 require(leaps)
+require(xtable)
 # required for Maritza
 require(rpart)
 require(tree)
@@ -399,22 +400,39 @@ Model Diagnostics combines both graphical and statistical methods.
 Using our formal model:
 <<echo=FALSE, message=FALSE>>=
 results<-(lm(weight ~ weeks+ + marital + gained + gender + habit + whitemom,births2))
+results.table<-xtable(results)
 @
 
+\begin{table}[ht]
+\centering
+\begin{tabular}{rrrrr}
+\hline
+& Estimate & Std. Error & t value & Pr($>$$|$t$|$) \\
+\hline
+(Intercept) & -6.2423 & 0.4581 & -13.63 & 0.0000 \\
+weeks & 0.3290 & 0.0120 & 27.51 & 0.0000 \\
+maritalnot married & 0.2651 & 0.0757 & 3.50 & 0.0005 \\
+gained & 0.0093 & 0.0024 & 3.81 & 0.0001 \\
+gendermale & 0.3784 & 0.0690 & 5.49 & 0.0000 \\
+habitsmoker & -0.3888 & 0.1048 & -3.71 & 0.0002 \\
+whitemomwhite & 0.2121 & 0.0813 & 2.61 & 0.0092 \\
+\hline
+\end{tabular}
+\end{table}
 Leverage = ability to move a regression model by itself by moving in the y direction.  Shifted in the y direction. Leverage is always between one and zero. Zero implies that there is no effect on the model whereas one means the lines follow the point perfectly.
 
-<<echo=FALSE, message=FALSE,fig.height=4,fig.width=4>>=
+<<echo=FALSE, message=FALSE,fig.height=3.5,fig.width=6>>=
 lev<-hat(model.matrix(results))
 plot(lev,col="blue",main="leverage")
 births2[lev>0.04,]
 @
 After reviewing the leverage plot I wanted to check for outliers that maybe of interest. Observations 18, 287 and 969 seemed to be the most important for leverage.
 
-Point 969 has the highest leverage. 
 
 
 
-<<echo=FALSE, message=FALSE,fig.height=4,fig.width=4>>=
+
+<<echo=FALSE, message=FALSE,fig.height=3.5,fig.width=6>>=
 #results.residuals<-resid(results)
 #plot(results.residuals)
 
@@ -424,19 +442,9 @@ Point 969 has the highest leverage.
 cook<-cooks.distance(results)
 plot(cook,ylab="Cook's Distances")
 births2[cook>0.02,]
+
 @
 
-\begin{center}
-\begin{tabular}{|r|r|r|r|}
-\hline
-Model&AIC&BIC&Adjusted $R^2$\\
-\hline
-Original 1012&2864.074&2912.767&0.475\\
-Original 833&2972.751&3011.981&0.493\\
-Final Model&\bf{2795.747}&\bf{2859.045}&\bf{0.513}\\
-\hline
-\end{tabular}
-\end{center}
 
 
 \subsection{Methods}
