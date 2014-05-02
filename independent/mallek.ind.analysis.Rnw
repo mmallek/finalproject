@@ -43,7 +43,8 @@ births = read.table(text=births, sep='\t', header=TRUE)
 @
 
 \section{Classification and Regression Trees (CART)}
-\subsection{Introduction} Classification and Regression Trees (CARTs) are a nonparametric approach to regression. CARTs are generated through binary recursive partitioning, in which each potential independent variable used to build the model is tested to obtain the value at which the most meaningful split between two branches can be created. The rules can vary within and among R packages, but the goal is usually to minimize a value such as the sum of squared residuals, Gini index, or misclassification rate. The recursive aspect occurs as this process is repeated at each node of the tree, creating two new branches off each node until some predefined set of constraints are met, which stops the model. These constraints may include the number of observations in a node or marginal improvement in the value to be minimized. %*At this point, the appropriate regression (logistic, in the case of a classification tree) can be run on the observations contained in each terminal node.*
+\subsection{Introduction} Classification and Regression Trees (CARTs) are a nonparametric approach to regression. CARTs are generated through binary recursive partitioning, in which each potential independent variable used to build the model is tested to obtain the value at which the most meaningful split between two branches can be created. The rules can vary within and among R packages, but the goal is usually to minimize a value such as the sum of squared residuals, Gini index, or misclassification rate. The recursive aspect occurs as this process is repeated at each node of the tree, creating two new branches off each node until some predefined set of constraints are met, which stops the model. These constraints may include the number of observations in a node or marginal improvement in the value to be minimized.
+
 \paragraph{} Trees are popular because they are fairly intuitive to interpret, especially for non-statisticians, including in public health settings. At each node an equality is shown; for a given observation, if the inequality resolves as \textsc{true}, the reader follows the left branch. The alternative to CARTs is typically some form of parametric regression, such as GLM. For a doctor in a hospital, consulting a regression tree is much simpler than generating and interpreting a regression model. Because CARTs are nonparametric, we cannot use the results to explain why certain variable values result in the observed response, but in situations where we are interested in the likelihood and not necessarily interested in how to change an outcome, CARTs are a reasonable tool. They may be used for either exploratory or predictive data analysis.
 
 \subsection{Methods: CART using R} Analysts running CART analysis in R typically use either the \verb|tree| or the \verb|rpart| package. The \verb|tree| package uses residuals, similarly to GLMs, while \verb|rpart| grows the tree using the Gini index of the data. In this analysis, the tree package was the primary tool. Also included are results using \verb|rpart| because better data visualization tools are available for this package, even if it is not as directly interpretable as the output from \verb|tree|.
@@ -136,24 +137,8 @@ text(bt3, use.n=TRUE, all=TRUE, pretty=10, cex=0.6)
 fancyRpartPlot(bt3)
 
 cparam = bt3$cptable[which.min(bt3$cptable[,"xerror"]),"CP"]
-#pbt3 = prune(bt3, cp=cparam)
-#plot(pbt3, uniform=TRUE, main="Pruned Classification Tree for Low Birth Weight")
-#text(pbt3, use.n=TRUE, all=TRUE, cex=.8)
 
-#fancyRpartPlot(pbt3, main="Pruned Classification Tree for Low Birth Weight", uniform=FALSE)
-#fancyRpartPlot(pbt3)
-#prp(bt3, type=1, extra=101, uniform=FALSE)
-
-#bt4 = rpart(form1, data=births, method="class")
-#fancyRpartPlot(bt4)
-#cparam = bt4$cptable[which.min(bt4$cptable[,"xerror"]),"CP"]
-#pbt4 = prune(bt4, cp=cparam)
-#fancyRpartPlot(pbt4)
 @
-
-%<<echo=FALSE, fig.height=4, fig.width=4, message=FALSE, warning=FALSE, fig.cap='Gini Coefficient-Based Tree Output %and Diagram for Pruned Classification Tree'>>=
-%fancyRpartPlot(bt3)
-%@
 
 \subsection{Discussion and Conclusions}
 \subsubsection{Classification Trees vs. GLM}
