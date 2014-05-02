@@ -430,7 +430,7 @@ plot(lev,col="blue",main="Leverage")
 
 \begin{table}[ht]
 \centering
-\begin{tabular}{rrrrrr}
+\begin{tabular}{rrrrrrrr}
 \hline
 Observation & mature & weeks &  marital & gained & weight &habit&whitemom\\
 \hline
@@ -455,7 +455,7 @@ plot(cook,ylab="Cook's Distances")
 @
 \begin{table}[ht]
 \centering
-\begin{tabular}{rrrrrr}
+\begin{tabular}{rrrrrrrr}
 \hline
 Observation & mature & weeks &  marital & gained & weight &habit&whitemom\\
 \hline
