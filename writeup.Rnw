@@ -40,11 +40,15 @@ require(rpart)
 require(tree)
 require(rattle)
 require(rpart.plot)
+require(Hmisc)
+require(Amelia)
+require(Zelig)
 @
 % Load data
 <<echo=FALSE>>=
 births = getURL("https://raw.githubusercontent.com/mmallek/finalproject/master/ncbirths.txt",ssl.verifypeer=FALSE, followlocation=1L, .opts=curlOptions(sslversion=3))
 births = read.table(text=births, sep='\t', header=TRUE)
+ncbirths = births
 attach(births)
 @
 
@@ -592,8 +596,105 @@ Classification trees were of mixed use in exploring this dataset. Four of the pr
 %%%%%%%%%%%%%%%%%%%%% Steele's Analysis %%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage
+\section{Missing Data: Steele Valenzuela}
+\subsection{Introduction} Tackling missing data was born out of the frustration of having missing data in the Titanic Competition as well as running into issues with basic simple linear regression models.  Simply put, R's behavior when dealing with missing data is a pain in the arse.
+\paragraph{} According to online and statistical literature, it appears that Little \& Rubin, 1987, cavaliered methods of placing data into missing values, or in other words, the process of \emph{imputation}.  Since then, statisticians have pulled their hair out over ways of dealing with missing data as well as innovated the field with new and promising methods, one of which I will show in later on.  Ultimately, this section will tackle three basic ideas, \textbf{finding}, \textbf{visualizing}, and \textbf{analyzing} missing data.
 
+\subsection{Finding Missing Data} Basic \textbf{NA} functions are really useful in finding missing values.  The functions below will find the total number of missing values and the total number of rows that do not contain missing values.
+<<echo=TRUE>>=
+missing <- is.na(ncbirths) #stores total number of TRUEs that indicates NA's
+sum(missing) #total number of NA's in dataset
 
+ncbirths.new <- na.omit(ncbirths) #na.omit omits any rows with data points NA
+nrow(ncbirths.new) #nrow counts the number of rows in our new subset
+@
+Furthermore, if one wanted to meticulously examine each row that contains missing data, the following function is quite useful.
+<<echo=TRUE, results='hide'>>=
+ncbirths[!complete.cases(ncbirths),] #this function will view all 200 rows of missing data
+head(ncbirths[!complete.cases(ncbirths),], 3) #viewing the first three rows
+@
+Let us move onto visualizing missing data.
+
+\subsection{Visualizing Missing Data}
+\emph{Please note, if wanting an in-depth analysis of visual aids for missing data, please see lab exercise or individual analysis.} The first basic function in visualizing missing data comes from the \textbf{ggplot2} package as shown below.  This function will only quantify the missing values, but it is really bright, useful, and quick.
+<<echo=TRUE, fig.height=4, fig.width=4, message=FALSE>>=
+ggmissing(ncbirths, avoid="stack", order=TRUE, missing.only=TRUE) #see ?ggmissing for arguments as they are quite basic
+@
+The next visual aid is a scatterplot, that is tricky to grasp its meaning at first, but is best understood as displaying missing data \textbf{in the margins}.
+<<echo=FALSE, fig.width=4, fig.height=4>>=
+min.age <- with(ncbirths, min(fage, na.rm=T)) #na.rm must be specified or the minimum value will default to NA
+tenprcnt.min.age <- (90/100)*min.age #the minimum age is 14 and 90% is 12.6
+ncbirths$imputed.fage <- impute(ncbirths$fage, fun=tenprcnt.min.age)
+qplot(imputed.fage, mage, data=ncbirths, geom=c("point", "jitter"), color=I("purple"), size=I(3), alpha=I(.4))+scale_y_continuous(breaks=seq(10, 50, 5))+scale_x_continuous(breaks=seq(10,50,5))
+@
+As aforementioned, this is a tricky plot, but the techniques utilized are simple.  Using the \emph{Hmisc} package and a simple imputation function, all of the missing values for the variable \textbf{fage} are imputed with a value that is ten percent lower than the minimum value.  We see that the minimum value for \textbf{fage} is 14, and ten percent lower is 12.6.  Essentially, the distribution of \textbf{fage} missing values can be seen against \textbf{mage}. 
+
+\subsection{Analyzing Missing Data}
+For the analysis of missing data, we need two items, the group's original model and the imputed model.  Let us run the original model our group has chosen below.
+<<echo=TRUE >>=
+group.model <- lm(weight~fage+mage+weeks+visits+marital+gained+gender+habit+whitemom, data=ncbirths)
+summary(group.model)
+@
+From the summary of our group model, we see that 200 rows were omitted due to missing values.  We will now implement the Amelia package and its obvious function \textbf{amelia} to create an imputed dataset.
+<<echo=TRUE, message=FALSE, results='hide'>>=
+set.seed(690) #let's set the seed so this example is reproducible.
+imp.ncbirths <- amelia(x=ncbirths, m=10, idvars="imputed.fage", noms=c("mature", "premie", "lowbirthweight", "marital", "gender", "habit", "whitemom"))
+@
+Next, let us analyze the data with the Zelig package and its obvious function \textbf{zelig}.
+<<echo=TRUE, results='hide'>>=
+imp.group.model <- zelig(weight~fage+mage+weeks+visits+marital+gained+gender+habit+whitemom, 
+data=imp.ncbirths$imputations, model="ls") 
+#it is semantically styled similarly to the *lm* function
+@
+<<echo=FALSE>>=
+summary(imp.group.model)
+@
+We may compare each of the coefficients of the original group model and the imputed model, but rather, a visual is preferred to handle this much information.  If our model contained a 2, 3, or even 4 variables, it may be possible to manually compare models, but for now, we will not.  The visual aid is shown below. 
+<<echo=FALSE, fig.height=6, fig.width=6, results='hide'>>=
+b.out<-NULL #empty cells for extracting beta coefficients 
+se.out<-NULL #and standard errors
+
+#for loop that will draw out said values of imputed model
+for(i in 1:imp.ncbirths$m) { # Replicate the model on each imputed dataset
+ols.out <- lm(weight~fage+mage+weeks+visits+marital+gained+gender+habit+whitemom, #imputed model
+data = imp.ncbirths$imputations[[i]])
+b.out <- rbind(b.out, ols.out$coef)
+se.out <- rbind(se.out, coef(summary(ols.out))[,2])
+}
+
+combined.results <- mi.meld(q=b.out, se=se.out) #an Amelia function made for the above 'for loop'
+combined.results #final product that is easier to read
+
+lwdFrame <- data.frame(Variable = rownames(summary(group.model)$coef),
+Coef = summary(group.model)$coef[, 1],
+SE = summary(group.model)$coef[, 2],
+Method = "listwiseDelete")
+midFrame <- data.frame(Variable = colnames(combined.results$q),
+Coef = c(combined.results$q),
+SE = c(combined.results$se),
+Method = "imputation")
+resultFrame <- data.frame(rbind(lwdFrame, midFrame))
+
+zp1 <- ggplot(resultFrame, aes(colour = Method))
+
+zp1 <- zp1 + geom_hline(yintercept = 0, colour = gray(1/2), lty = 2)
+
+zp1 <- zp1 + geom_linerange(aes(x = Variable, ymin = Coef - SE*1,
+ymax = Coef + SE*1),
+lwd = 1, position = position_dodge(width = 1/2))
+
+zp1 <- zp1 + geom_pointrange(aes(x = Variable, y = Coef,
+ymin = Coef - SE*2, ymax = Coef + SE*2),
+lwd = 1/2, position = position_dodge(width = 1/2),
+shape = 21, fill = "WHITE")
+
+zp1 <- zp1 + coord_flip() + theme_bw()
+
+zp1 <- zp1 + ggtitle("Comparing coefficient estimates by missing data methods")
+
+print(zp1)
+@
+So, let's walk through the basic characteristics of this plot.  The y-axis displays names of our variables in the model, the x-axis displays the values of the beta coefficients of the respective variables, the red figures display our orginal listwise deletion model \(200 rows were omitted\), and the blue figures display our imputed data using the Amelia package.  If you look closely at the red and blue figures, there is a short dark shade and a longer lighter shade.  This displays 1 and 2 standard deviations from the coefficient estimate, respectively.  Visible and slight differences may be seen for the \emph{intercept} and the variables \textbf{gender}, \textbf{habit}, \textbf{married}, and \textbf{whitemom}. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%% 1 Page Discussion/Conclusions %%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
