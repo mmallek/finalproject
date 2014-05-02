@@ -20,6 +20,7 @@
 
 
 \begin{document}
+\vspace{-3ex}
 \maketitle
 
 \tableofcontents
@@ -95,13 +96,11 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
 @
 
 \section{Introduction}
-This dataset was acquired from OpenIntro.org's free collection. According to the metadata, `ncbirths' was released in 2004 by North Carolina. This data set has been of interest to medical researchers who are studying the relation between habits and practices of expectant mothers and the birth of their children. The data provided by OpenIntro is a random sample of 1,000 cases from this data set.
+\subsection{Dataset: NCBirths} This dataset was acquired from OpenIntro.org's free collection. According to the metadata, `ncbirths' was released in 2004 by North Carolina. This data set has been of interest to medical researchers who are studying the relation between habits and practices of expectant mothers and the birth of their children. The data provided by OpenIntro is a random sample of 1,000 cases from this data set.
 
 Of the 13 variables presented in the dataset, there are several options for thinking about predictors vs. response variables. Some of these are clearly predictors: \verb|fage|, \verb|mage|, \verb|marital|, \verb|habit|, \verb|gender|, \verb|whitemom|. Others could be considered either predictors or responses: \verb|weeks|, \verb|premie|, \verb|visits|, \verb|gained|, \verb|weight| (or \verb|lowbirthweight|). Based on the dataset description, which states that the research was exploring "habits and practices of expectant mothers," our inference is that habits and practices refer to weight gained by the mother and the smoking status of the mother (possibly marital status as well). The most likely responses are (hospital) \verb|visits|, (gestational) \verb|weeks| (related to \verb|premie|), and (baby's birth) \verb|weight| (related to \verb|lowbirthweight|). An additional key characteristic of this dataset is that 6 of the variables are pairs of continuous and categorical data (see Table \ref{table:factors}).
 
-
-
-We are most interested in the baby's weight at birth, which we will examine in both its continuous and factored format. We chose not to construct a specific hypothesis based on this data to allow for freedom and flexibility within the individual projects. We assumed that all variables collected were potentially important or significant as predictors, so they were all included at the initial phase of each individual analysis. The initial, full model (shown for both the continuous and categorical version of the variable-of-interest) is shown here:
+\subsection{Focus of Analysis} We are most interested in the baby's weight at birth, which we will examine in both its continuous and factored format. We chose not to construct a specific hypothesis based on this data to allow for freedom and flexibility within the individual projects. We assumed that all variables collected were potentially important or significant as predictors, so they were all included at the initial phase of each individual analysis. The initial, full model (shown for both the continuous and categorical version of the variable-of-interest) is shown here:
 
 <<eval=FALSE>>=
 lm(weight ~ mage + fage + weeks + visits + gained + habit + whitemom + marital + gender)
@@ -116,7 +115,7 @@ Our individual analyses explore the relationships between variables and seek to 
 \centering
 \begin{tabular}{lllll}
 \hline
-Continuous Variable & Two-level Factor & Equation with factor labels & Observations & NAs\\
+Continuous Variable & Two-level Factor & Equation with factor labels & Observations & Missing Values\\
 \hline
 mage & mature & younger mom $< 35 \text{ years}<=$ mature mom & 867/133 & 0\\
 weeks & premie & premie $< 37 \text{ weeks}<= $ full term & 846/152 & 2\\
@@ -138,17 +137,15 @@ n/a & gender & female OR male & 503/497 & 0 \\
 % to size and wrap a column in a table: p{4cm}
 \begin{table}
 \centering
-\begin{tabular}{ccccccccc}
+\begin{tabular}{lllllllll}
 \hline
-Variable & \multirow{2}{*}{\parbox{2cm}{Variable Definitions}}  & Min & Median & Mean & Max & \multirow{2}{*}{\parbox{2cm}{Missing Values}} & 95\% CI for Mean & 95\% CI for Variance\\
+Variable & \multirow{2}{*}{\parbox{2cm}{Variable Definitions}}  & Min & Median & Mean & Max & \multirow{2}{*}{\parbox{2cm}{Missing \\ Values}} & 95\% CI for Mean & 95\% CI for Variance\\
  & & & & & & & & \\
 \hline
 fage & father's age & 14 & 30 & 30.26 & 55 & 171 & (29.7953, 30.71616) & (41.6428, 50.49614)\\
 mage & mother's age & 13 & 27 & 27 & 50 & 0 & (26.61489, 27.38511) & (35.4345, 42.23142) \\
 weeks & gestational age & 20 & 39 & 38.33 & 45 & 2 & (38.15279, 38.51655) & (7.886806,9.40128) \\
 visits & hospital visits & 0 & 12.0 & 12.1 & 30 & 9 & (11.85871,12.35118) & (14.35011,17.11633)\\
-%gained & \multirow{2}{*}{weight gained} & 0 & 30 & 30.33 & 85 & 27 \\
-%&  by mother & & & & & \\
 gained & \multirow{2}{*}{\parbox{3cm}{weight gained by mother}} & 0 & 30 & 30.33 & 85 & 27 & (29.43097,31.22063) & (185.9254,222.1265) \\
  & & & & & & & & \\
 weight & birth weight of baby & 1 & 7.31 & 7.101 & 11.750 & 0 & (7.007482,7.194518) & (2.08949,2.490288)\\
@@ -714,9 +711,11 @@ As researchers and collaborators explore relationships between habits and practi
 
 \subsection{Findings}
 
-The dataset in it of itself showed that weeks was the strongest predictor of weight for the babies. The multitude of techniques for model-building collaborated with this notion and it would make intuitive sense that more developed babies in the womb would have a healthier weight than babies born prematurely. In terms of leverage, the dataset did not show any significant observations that would influence the model significantly. 
+All individual analyses of the dataset found that weeks was the strongest predictor of weight for the babies. The multitude of techniques for model-building corroborate this conclusion, and it makes intuitive sense that more developed babies in the womb for more time would have a healthier weight than babies born prematurely. In terms of leverage, the dataset did not show any significant observations that would influence the model significantly. 
 
-One of the main challenges from this dataset is that we do not have data synced to a gestational age other than at term. The values for \verb|visits|, \verb|weeks|, \verb|weight|, and \verb|gained| are all collected at birth. While it makes sense to include all variables in any exploratory analysis of relationships among these variables, the value of any of these as prediction terms is problematic because they are collected at the end of the pregancy.
+One of the main challenges from this dataset is that we do not have data synced to a gestational age other than at term. The values for \verb|visits|, \verb|weeks|, \verb|weight|, and \verb|gained| are all collected at birth. While it makes sense to include all variables in any exploratory analysis of relationships among these variables, the value of any of these as prediction terms is problematic because they are collected at the end of the pregancy. Future studies should include data over time to enhance predictive power of any models developed.
+
+Regardless of the individual approach chosen, an appreciation of the complex decisions, and the potentially subtle or enormous ramifications of those decisions, was developed by each member of the team. This dataset was difficult to analyze in a way that generated interesting and meaningful conclusions, which was an unexpected outcome. However, this provided an additional lesson in the importance of careful study design, as the potential for any dataset to answer the questions asked by the researcher is clearly highly constrained by the methodology employed in data collection.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
